@@ -1,5 +1,5 @@
 # introduction_to_R
-A Bevezetés az R programozásba kurzus anyagai / Course material for the R course (HU) 
+A *Bevezetés az R programozásba kurzus* anyagai / Course material for the *Introduction to R Programming* course (HU) 
 
 BME 2018-19. tavaszi félév
 
