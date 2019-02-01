@@ -1,0 +1,4 @@
+név;kor;magasság
+Anna;22;175,3
+Béla;25;180,2
+Csaba;23;190,6

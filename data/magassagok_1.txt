@@ -1,0 +1,4 @@
+nev,kor,magassag
+Anna,22,175
+Bela,25,180
+Csaba,23,190
