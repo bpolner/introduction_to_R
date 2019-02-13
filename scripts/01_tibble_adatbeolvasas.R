@@ -1,10 +1,10 @@
 # A tibble. Fájlok olvasása és írása.
 
 require(tidyverse)
-require(data.table)
-require(microbenchmark)
+# require(data.table)
+# require(microbenchmark)
 require(nycflights13)
-require(feather)
+# require(feather)
 
 
 # 1. A tibble ----------------------------------------------------------------
@@ -42,7 +42,7 @@ tb <- tibble(
 tb
 
 # Transzponalt adatbevitel a tribble() fuggvennyel:
-# ez akkor nagyon jó, ha kódban akarunk bevinni egy adattáblát.
+# ez akkor nagyon jó, ha kódban akarunk bevinni egy kisebb adattáblát.
 # Oszlopok neveit formulával adjuk meg ( ~ <név>), 
 # az értékeket pedig vesszővel elválasztva soroljuk fel
 
@@ -59,16 +59,15 @@ tribble(
 
 mpg
 
-# Megjelenített sorok es oszlopok számának szabályozása:
+# Megjelenített sorok számának és a konzolra nyomtatott adatok szélességének szabályozása:
 
-mpg %>% 
-  print(n = 10, width = Inf)
+print(mpg, n = 10, width = 10)
 
 # Modosithatjuk az alapbeallitasokat is
 
 # Ha tobb mint m sor van, nyomtasson n sort
 
-options(tibble.print_max = n, tibble.print_min = m)
+# options(tibble.print_max = n, tibble.print_min = m)
 
 # Mindig minden sor nyomtatasa:
 
@@ -82,6 +81,9 @@ options(tibble.width = Inf)
 
 package?tibble
 ?print.tbl
+
+# Megtekintés az RStudio-ban:
+View(mpg)
 
 # Hogyan tudunk kinyerni egyetlen változót?
 
@@ -101,6 +103,7 @@ df[["x"]]
 df[[1]]
 
 # Ha egy pipe-ban szeretnénk használni, használjuk a . helyőrzőt!
+# (pipe %>% operátorról később!)
 
 df %>% .$x
 
@@ -133,7 +136,6 @@ df <- data.frame(abc = 1, xyz = "a")
 df$x
 df[, "xyz"]
 df[, c("abc", "xyz")]
-
 
 # 2. Adatok importálása  ------------------------------------
 
