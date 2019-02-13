@@ -145,12 +145,12 @@ df[, c("abc", "xyz")]
 
 # A beolvásófüggvények első argumentuma a fájl elérési útja:
 # meg kell mondani a függvénynek, hogy hol van a fájl, amit 
-# szeretnénk betölteni az R-be.
+# be szeretnénk tölteni az R-be.
 
 magas <- read.csv("C://Users/Polner Bertalan/Dropbox/oktatás/R_bevezetes/data/magassagok_1.txt")
 
 # Ez azonban kényelmetlen lehet, ha szeretnénk, 
-# h több gépen is működjön a kód.
+# hogy több gépen is működjön a kód.
 # Megoldás, ha RStudio projektet használunk.
 
 magas <- read.csv("data/magassagok_1.txt")
@@ -232,7 +232,7 @@ read_csv(
 # Felulirhato! Mikor lehet erre szukseg?
 
 
-
+# 1) metaadatok a fájl tetején
 
 read_csv(
   "The first line of metadata
@@ -280,7 +280,7 @@ read_csv("a,b,c\n1,2,.", na = ".")
 
 # 2.2.1 readr - gyakorlás -------------------------------------------------
 
-# Mi a gond a kódból megadott csv fájlokkal?
+# Mi a gond ezekkel a kódból megadott csv fájlokkal?
 
 read_csv("a,b\n1,2,3\n4,5,6")
 read_csv("a,b,c\n1,2\n1,2,3,4")
@@ -294,7 +294,7 @@ read_csv("a;b\n1;3")
 # Hogyan olvassa be a readr a lemezről a fájlokat?
 
 # Ehhez előbb nézzük meg, hogyan dolgoznak a parse_* függvények!
-# Adunk nekik egy karaktervektort, és visszaadnak egy spec. vektort.
+# Adunk nekik egy karaktervektort, és visszaadnak egy speciális vektort.
 
 str(parse_logical(c("TRUE", "FALSE", "NA")))
 
@@ -384,6 +384,8 @@ charToRaw("Hadley")
 
 x1 <- "\x82\xb1\x82\xf1\x82\xc9\x82\xbf\x82\xcd"
 
+x1
+
 parse_character(x1, locale = locale(encoding = "Shift-JIS"))
 
 
@@ -399,6 +401,8 @@ guess_encoding(charToRaw(szoveg))
 
 # 2.3.3 Faktorok (kategorikus változók) -----------------------------------
 
+# Lehetséges értékek halmaza ismert
+
 fruit <- c("apple", "banana")
 
 parse_factor(c("apple", "banana", "bananana"), levels = fruit)
@@ -411,7 +415,7 @@ parse_factor(c("apple", "banana", "bananana"), levels = fruit)
 
 # Alapbeállítás szerint:
 
-# a, parse_datetime ISO8601 formátumra számít év...másodperc
+# a, parse_datetime ISO8601 formátumra számít év, hónap, nap, óra, perc, másodperc
 
 parse_datetime("2010-10-20 141345")
 
@@ -423,13 +427,16 @@ parse_datetime("20101010")
 
 parse_date("2010-10-01")
 
-# c, parse_time óra, :, perc (opcionális , : másodperc és am/pm)
+# c, parse_time óra : perc (opcionális : másodperc és am/pm)
 
 parse_time("01:10 am")
 
 parse_time("20:10:01")
 
 # Ha az alapbeállítások nem működnek, megadhatunk egyedi formátumot
+
+# részleteket lásd https://r4ds.had.co.nz/data-import.html#readr-datetimes 
+
 
 parse_date("01/02/15", "%d/%m/%y")
 parse_date("01/02/15", "%d/%m/%y")
@@ -463,20 +470,16 @@ problems(challenge)
 
 # Mi volt az oszlopok meghatározása az előző beolvasásnál?
 
-# cols(
-#   x = col_integer(),
-#   y = col_character()
-# )
-
 # Módosítsuk az oszlopok típusát!
 
-challenge <- read_csv(
-  readr_example("challenge.csv"), 
-  col_types = cols(
-    x = col_double(),
-    y = col_character()
+challenge <- 
+  read_csv(
+    readr_example("challenge.csv"), 
+    col_types = cols(
+      x = col_double(),
+      y = col_character()
+    )
   )
-)
 
 # Ezzel az x beolvasára rendben. Mi a helyzet az y-nal?
 
