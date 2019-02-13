@@ -3,3 +3,5 @@
 .RData
 .Ruserdata
 introduction_to_R.Rproj
+challenge_out.RDS
+challenge_out.csv

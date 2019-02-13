@@ -472,8 +472,7 @@ problems(challenge)
 
 # Módosítsuk az oszlopok típusát!
 
-challenge <- 
-  read_csv(
+challenge <- read_csv(
     readr_example("challenge.csv"), 
     col_types = cols(
       x = col_double(),
@@ -481,7 +480,7 @@ challenge <-
     )
   )
 
-# Ezzel az x beolvasára rendben. Mi a helyzet az y-nal?
+# Mi a helyzet az y-nal?
 
 challenge
 tail(challenge)
@@ -499,6 +498,9 @@ challenge <- read_csv(
 challenge
 tail(challenge)
 
+# Ha az adat már R-ben van mint karaktervektor: parse_xyz
+# Ha a readr beolvasást akarjuk irányítani:     col_xyz
+
 # Érdemes mindig explicit megadni az oszlopok típusát, 
 # következetes és reprodukálhatóbb lesz az adatimportálás. 
 
@@ -513,8 +515,9 @@ challenge_2 <- read_csv(
 
 # Vagy ha minden oszlopot karakternek olvasunk be, 
 
-challenge_2 <- read_csv(readr_example("challenge.csv"), 
-                       col_types = cols(.default = col_character())
+challenge_2 <- read_csv(
+  readr_example("challenge.csv"), 
+  col_types = cols(.default = col_character())
 )
 
 # És utána a type_convert-tel felismertetjük az oszlopok típusát
@@ -565,7 +568,7 @@ fl <- fread(path, select = 5, nrows = 100)
 
 # Két arg-t mindenképp meg kell adni: melyik adatot, és hová írjuk
 
-write_csv(not_cancelled, "output.csv")
+write_csv(challenge, "challenge_out.csv")
 
 ch_again <- read_csv("challenge_out.csv")
 
