@@ -128,6 +128,8 @@ class(as.data.frame(df))
 
 var <- "cty"
 
+mpg[[var]]
+
 # 2) Hasonlítsd össze a következő műveleteket data.frame-n és
 # egy egyező tibble-n! Mi a különbség? 
 # Mi lehet a gond a data.frame működésében?
@@ -136,6 +138,12 @@ df <- data.frame(abc = 1, xyz = "a")
 df$x
 df[, "xyz"]
 df[, c("abc", "xyz")]
+
+df_t <-  tibble(abc = 1, xyz = "a")
+df_t$x
+df_t[, "xyz"]
+df_t[, c("abc", "xyz")]
+
 
 # 2. Adatok importálása  ------------------------------------
 
@@ -199,6 +207,7 @@ read.csv2
 # a sep és a dec argumentumokat a célnak megfelelően beállítva
 
 # 2.2 readr ----
+
 
 # A readr csomag legtöbb függvénye szövegfájlokat olvas be:
 

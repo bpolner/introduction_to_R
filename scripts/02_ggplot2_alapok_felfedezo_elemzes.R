@@ -5,8 +5,8 @@
 
 # Toltsuk be a tidyverse csomagot 
 # Ebben van ggplot2 is, meg egy csomo egyeb hasznos cucc
-# Ha nincs telepitve a tidyverse csomag, igy telepitheto (internetkapcsolat kell!)
-if(!require(tidyverse))install.packages("tidyverse")
+
+library(tidyverse)
 
 #### 1. Adatok elso ranezesre ---------------- 
 
@@ -30,21 +30,21 @@ str(mpg)
 head(mpg)
 tail(mpg)
 
-#### 2. Ábrázoljunk!  --------------------------------
+#### 2. ÃbrÃ¡zoljunk!  --------------------------------
 
-# Vajon milyen összefüggés van az autók fogyasztása és a hengerûrtartalom között?
+# Vajon milyen Ã¶sszefÃ¼ggÃ©s van az autÃ³k fogyasztÃ¡sa Ã©s a hengerÅ±rtartalom kÃ¶zÃ¶tt?
 
-# Az elsõ sor létrehoz egy koordináta-rendszert, amihez hozzáadhatunk rétegeket
+# Az elsÅ‘ sor lÃ©trehoz egy koordinÃ¡ta-rendszert, amihez hozzÃ¡adhatunk rÃ©tegeket
 ggplot(data = mpg) +
-  # Hozzáadunk egy réteget, ahol a pontok x és y koordinátáihoz rendeljük a változókat
+  # HozzÃ¡adunk egy rÃ©teget, ahol a pontok x Ã©s y koordinÃ¡tÃ¡ihoz rendeljÃ¼k a vÃ¡ltozÃ³kat
   geom_point(mapping = aes(x = displ, y = hwy))
 
-# Minden geom függvénynek van mapping argumentuma.
+# Minden geom fÃ¼ggvÃ©nynek van mapping argumentuma.
 # A mappinget mindig az aes() fgv-nyel adjuk meg.
-# A ggplot2 a mapping-ben megadott változókat a data argumentumnál 
-# meghatározott adatban keresi. 
+# A ggplot2 a mapping-ben megadott vÃ¡ltozÃ³kat a data argumentumnÃ¡l 
+# meghatÃ¡rozott adatban keresi. 
 
-# Általános alak:
+# ÃltalÃ¡nos alak:
 # ggplot(data = <DATA>) + 
 #   <GEOM_FUNCTION>(mapping = aes(<MAPPINGS>))
 
@@ -58,40 +58,40 @@ ggplot(data = mpg) +
 
 #### 3. Esztetikai parameterek beallitasa --------------------------------
 
-# Néhány autó mintha "kilógna" a mintára jellemzõ trendbõl. 
-# Milyen szempontból lehetnek speciálisak azok az autók?
-# Jelenítsük meg a különbözõ osztályú autókat eltérõ színnel!
+# NÃ©hÃ¡ny autÃ³ mintha "kilÃ³gna" a mintÃ¡ra jellemzÅ‘ trendbÅ‘l. 
+# Milyen szempontbÃ³l lehetnek speciÃ¡lisak azok az autÃ³k?
+# JelenÃ­tsÃ¼k meg a kÃ¼lÃ¶nbÃ¶zÅ‘ osztÃ¡lyÃº autÃ³kat eltÃ©rÅ‘ szÃ­nnel!
 
 ggplot(data = mpg) +
-  geom_point(mapping = aes(x = displ, y = hwy))
+  geom_point(mapping = aes(x = displ, y = hwy, colour = class))
 
-# a colour-hoz rendelt változó minden egyedi szintje saját színt kapott az ábrán
-# jelmagyarázat is automatikusan létrejött
+# a colour-hoz rendelt vÃ¡ltozÃ³ minden egyedi szintje sajÃ¡t szÃ­nt kapott az Ã¡brÃ¡n
+# jelmagyarÃ¡zat is automatikusan lÃ©trejÃ¶tt
 
-# Más esztétikai paraméterekhez is hozzárendelhetünk egy változót
+# MÃ¡s esztÃ©tikai paramÃ©terekhez is hozzÃ¡rendelhetÃ¼nk egy vÃ¡ltozÃ³t
 
-# Áttetszõséghez (bár ebben az esetben nincs igazán értelme)
+# ÃttetszÅ‘sÃ©ghez (bÃ¡r ebben az esetben nincs igazÃ¡n Ã©rtelme)
 ggplot(data = mpg) +
   geom_point(mapping = aes(x = displ, y = hwy, alpha = class))
 
-# Hogyan rendelnétek hozzá az osztályt a pontok méretéhez?
+# Hogyan rendelnÃ©tek hozzÃ¡ az osztÃ¡lyt a pontok mÃ©retÃ©hez?
 
 
-# És a pontok formájához?
+# Ã‰s a pontok formÃ¡jÃ¡hoz?
 
 
-# Az esztétikai paramétereket kézileg is állíthatjuk. 
-# Ilyenkor az aes(), a geom függvény egy argumentumának 
-# értékét megadva állíthatjuk be a megjelenést. 
+# Az esztÃ©tikai paramÃ©tereket kÃ©zileg is Ã¡llÃ­thatjuk. 
+# Ilyenkor az aes() utÃ¡n, a geom fÃ¼ggvÃ©ny egy argumentumÃ¡nak 
+# Ã©rtÃ©kÃ©t megadva Ã¡llÃ­thatjuk be a megjelenÃ©st. 
 
 ggplot(data = mpg) +
   geom_point(mapping = aes(x = displ, y = hwy), color = "darkblue")
 
-# Színek: string
-# Méret: szám (mm)
-# Forma: egész szám
+# SzÃ­nek: string
+# MÃ©ret: szÃ¡m (mm)
+# Forma: egÃ©sz szÃ¡m
 
-# Milyen formák közül választhatunk?
+# Milyen formÃ¡k kÃ¶zÃ¼l vÃ¡laszthatunk?
 
 minta_adat <- data.frame(x = 1:24, 
                          y = 1:24, 
@@ -103,26 +103,26 @@ ggplot(data = minta_adat) +
   scale_shape_manual(values = 1:24)
 
 
-## 3.1 Gyakorlas - esztétikai paraméterek ----------------
+## 3.1 Gyakorlas - esztÃ©tikai paramÃ©terek ----------------
 
-# 1) Miért nem kékek a pontok?
+# 1) MiÃ©rt nem kÃ©kek a pontok?
 ggplot(data = mpg) + 
   geom_point(mapping = aes(x = displ, y = hwy, color = "blue"))
 
-# 2) Melyek a folytonos es kategorikus változók az mpg-ben? 
+# 2) Melyek a folytonos es kategorikus vÃ¡ltozÃ³k az mpg-ben? 
 
 
-# 3) color, shape, size hogyan viselkedik, ha folytonos változót rendelünk hozzá?
+# 3) color, shape, size hogyan viselkedik, ha folytonos vÃ¡ltozÃ³t rendelÃ¼nk hozzÃ¡?
 
 
-# 4) Mi történik, ha egy változót több esztétikai paraméterhez is hozzárendelünk?
+# 4) Mi tÃ¶rtÃ©nik, ha egy vÃ¡ltozÃ³t tÃ¶bb esztÃ©tikai paramÃ©terhez is hozzÃ¡rendelÃ¼nk?
 
 
-# 5) Mi történik, ha nem egyszerûen egy változót használunk az esztétika megadásánál?
+# 5) Mi tÃ¶rtÃ©nik, ha nem egyszerÅ±en egy vÃ¡ltozÃ³t hasznÃ¡lunk az esztÃ©tika megadÃ¡sÃ¡nÃ¡l?
 # pl. aes(color=displ<5) ?
 
 
-# 6) Miért nem mûködnek ezek a kódok?
+# 6) MiÃ©rt nem mÅ±kÃ¶dnek ezek a kÃ³dok?
 
 ggplot(data = mpg) 
 + geom_point(mapping = aes(x = displ, y = hwy))
@@ -131,36 +131,36 @@ ggplot(data = mpg)
 ggplot(data = mpg) + 
   geom_point(mapping = aes(x = displ, y = hwy, color = "blue")
              
-# 7) Készíts egy pontfelhõt, ahol az x tg-en a displ, az y tg-en a hwy változó szerepel.
-# Használj 10-es méretû pontokat! Mi lehet a probléma ezzel az ábrával? 
-# Hogyan lehetne javítani az ábrán, anélkül, hogy a pontok méretén változtatnál?
+# 7) KÃ©szÃ­ts egy pontfelhÅ‘t, ahol az x tg-en a displ, az y tg-en a hwy vÃ¡ltozÃ³ szerepel.
+# HasznÃ¡lj 10-es mÃ©retÅ± pontokat! Mi lehet a problÃ©ma ezzel az Ã¡brÃ¡val? 
+# Hogyan lehetne javÃ­tani az Ã¡brÃ¡n, anÃ©lkÃ¼l, hogy a pontok mÃ©retÃ©n vÃ¡ltoztatnÃ¡l?
 
 
 
 #### 4. Facet-ek --------------------------------
 
-# Nem csak az esztétikai paraméterekkel jeleníthetünk meg további változókat.
-# Elkészíthetjük ugyanazt az ábrát az adat alhalmazain.
+# Nem csak az esztÃ©tikai paramÃ©terekkel jelenÃ­thetÃ¼nk meg tovÃ¡bbi vÃ¡ltozÃ³kat.
+# ElkÃ©szÃ­thetjÃ¼k ugyanazt az Ã¡brÃ¡t az adat alhalmazain.
 
-# Ha az alhalmazokat csak egy kategorikus változó mentén szeretnénk létrehozni,
-# használjuk a facet_wrap-et!
+# Ha az alhalmazokat csak egy kategorikus vÃ¡ltozÃ³ mentÃ©n szeretnÃ©nk lÃ©trehozni,
+# hasznÃ¡ljuk a facet_wrap-et!
 
 ggplot(data = mpg) + 
   geom_point(mapping = aes(x = displ, y = hwy)) + 
-  # 1. argumentuma egy formula (ami egy adatstruktúra az R-ben):
-  # formátuma: ~ <változó neve>
+  # 1. argumentuma egy formula (ami egy adatstruktÃºra az R-ben):
+  # formÃ¡tuma: ~ <vÃ¡ltozÃ³ neve>
   facet_wrap( ~ class, nrow = 2)
 
-# Ha két változót kombinálva szeretnénk alhalmazokat képezni, 
-# használjuk a facet_grid-et!
+# Ha kÃ©t vÃ¡ltozÃ³t kombinÃ¡lva szeretnÃ©nk alhalmazokat kÃ©pezni, 
+# hasznÃ¡ljuk a facet_grid-et!
 
 ggplot(data = mpg) + 
   geom_point(mapping = aes(x = displ, y = hwy)) + 
-  # formula formátuma facet_grid esetében:
-  # <változó az x tg-re> ~ <változó az y tg-re>
+  # formula formÃ¡tuma facet_grid esetÃ©ben:
+  # <vÃ¡ltozÃ³ az x tg-re> ~ <vÃ¡ltozÃ³ az y tg-re>
   facet_grid(drv ~ class)
 
-# facet_grid létrehozható csak egy változó szerint is:
+# facet_grid lÃ©trehozhatÃ³ csak egy vÃ¡ltozÃ³ szerint is:
 
 ggplot(data = mpg) + 
   geom_point(mapping = aes(x = displ, y = hwy)) + 
@@ -168,7 +168,7 @@ ggplot(data = mpg) +
 
 ## 4.1 Gyakorlas - facetek ----------------
 
-# 1) Mi történik, ha folytonos változót rendelünk facet-hez?
+# 1) Mi tÃ¶rtÃ©nik, ha folytonos vÃ¡ltozÃ³t rendelÃ¼nk facet-hez?
 
 # 2) Mit jelentenek az ures cellak a facet_grid(drv~class) abran?
 # Hogyan viszonyulnak ehhez?
@@ -186,15 +186,15 @@ ggplot(data = mpg) +
   geom_point(mapping = aes(x = displ, y = hwy)) +
   facet_grid(. ~ cyl)
 
-# 4) Készíts pontfelhõt, ahol a vízszintes tg-en a városi, 
-# a függõleges tengelyen pedig az országúti fogyasztás van megjelenítve!
-# A pontok színe tükrözze a hengerek számát!
-# Az üzemanyag típusa szerint hozz létre faceteket!
+# 4) KÃ©szÃ­ts pontfelhÅ‘t, ahol a vÃ­zszintes tg-en a vÃ¡rosi, 
+# a fÃ¼ggÅ‘leges tengelyen pedig az orszÃ¡gÃºti fogyasztÃ¡s van megjelenÃ­tve!
+# A pontok szÃ­ne tÃ¼krÃ¶zze a hengerek szÃ¡mÃ¡t!
+# Az Ã¼zemanyag tÃ­pusa szerint hozz lÃ©tre faceteket!
 
 
 
-# 5) Mik az elõnyei és hátrányai a fazettázásnak az 
-# esztétikai paraméterekhez rendeléshez képest?
+# 5) Mik az elÅ‘nyei Ã©s hÃ¡trÃ¡nyai a fazettÃ¡zÃ¡snak az 
+# esztÃ©tikai paramÃ©terekhez rendelÃ©shez kÃ©pest?
 
 ggplot(data = mpg) + 
   geom_point(mapping = aes(x = displ, y = hwy)) + 
@@ -204,8 +204,8 @@ ggplot(data = mpg) +
 
 #### 5. Geometriai objektumok (geom) --------------------------------
 
-# A ggplot2-ben többféle geometriai objektummal 
-# reprezentálhatjuk az adatokat.
+# A ggplot2-ben tÃ¶bbfÃ©le geometriai objektummal 
+# reprezentÃ¡lhatjuk az adatokat.
 
 ggplot(data=mpg) + 
   geom_point(mapping=aes(x=displ, y=hwy))
@@ -213,76 +213,76 @@ ggplot(data=mpg) +
 ggplot(data=mpg) + 
   geom_smooth(mapping=aes(x=displ, y=hwy))
 
-# Minden geom függvénynek van mapping argumentuma.
-# DE: az egyes geom tipusok eltérõ esztétikai paraméterekkel rendelkeznek.
+# Minden geom fÃ¼ggvÃ©nynek van mapping argumentuma.
+# DE: az egyes geom tipusok eltÃ©rÅ‘ esztÃ©tikai paramÃ©terekkel rendelkeznek.
 
-# Pl. trendvonalnál állítható a vonaltípus.
+# Pl. trendvonalnÃ¡l Ã¡llÃ­thatÃ³ a vonaltÃ­pus.
 
 ggplot(data = mpg) + 
   geom_smooth(mapping = aes(x = displ, y = hwy, linetype = drv))
 
-# A pontfelhõnél pedig pl. a pont formája.
+# A pontfelhÅ‘nÃ©l pedig pl. a pont formÃ¡ja.
 
 ggplot(data=mpg) + 
   geom_point(mapping=aes(x=displ, y=hwy, shape = drv))
 
-# Több, azonos megjelenésû geom csoportonkénti bontásban: group
+# TÃ¶bb, azonos megjelenÃ©sÅ± geom csoportonkÃ©nti bontÃ¡sban: group
 
 ggplot(data = mpg) +
   geom_smooth(mapping = aes(x = displ, y = hwy, group = drv))
 
-# Elhelyezhetünk több geom-ot is egy ábrán:
+# ElhelyezhetÃ¼nk tÃ¶bb geom-ot is egy Ã¡brÃ¡n:
 
 ggplot(data = mpg) + 
   geom_point(mapping = aes(x = displ, y = hwy)) +
   geom_smooth(mapping = aes(x = displ, y = hwy))
 
-# Ugyanazt a mapping-et adtuk meg kétszer. Ezt jó lenne egyszerûbben megadni.
+# Ugyanazt a mapping-et adtuk meg kÃ©tszer. Ezt jÃ³ lenne egyszerÅ±bben megadni.
 
-# Globális mapping megadása a ggplot() függvénynek.
+# GlobÃ¡lis mapping megadÃ¡sa a ggplot() fÃ¼ggvÃ©nynek.
 
 ggplot(data = mpg, mapping = aes(x = displ, y = hwy)) + 
   geom_point() + 
   geom_smooth()
 
-# A globális mapping-et felülírhatjuk csak egy adott rétegben.
+# A globÃ¡lis mapping-et felÃ¼lÃ­rhatjuk csak egy adott rÃ©tegben.
 
 ggplot(data = mpg, mapping = aes(x = displ, y = hwy)) + 
   geom_point(mapping = aes(color = class)) + 
   geom_smooth()
 
-# Trendvonal illesztésének meghatározása
+# Trendvonal illesztÃ©sÃ©nek meghatÃ¡rozÃ¡sa
 
 ggplot(data = mpg, mapping = aes(x = displ, y = hwy)) + 
   geom_point() + 
   geom_smooth(method = "lm") +
-  geom_smooth(method = "lm", formula = y ~ poly(x, 2), color = "red")
+  geom_smooth(method = "lm", formula = y ~ x + I(x^2), color = "red")
 
-# A geom-ok által reprezentált adatokat is felülírhatjuk lokálisan 
+# A geom-ok Ã¡ltal reprezentÃ¡lt adatokat is felÃ¼lÃ­rhatjuk lokÃ¡lisan 
 # a data argumentum felulirasa csak egy retegben.
 
 ggplot(data = mpg, mapping = aes(x = displ, y = hwy)) + 
   geom_point(mapping = aes(color = class)) + 
   geom_smooth(data = filter(mpg, class == "subcompact"), se = FALSE)
-# a trendvonalat csak a subcompact osztályú autókra illesztettük
-# (a filter függvénnyel majd késõbb foglalkozunk)
+# a trendvonalat csak a subcompact osztÃ¡lyÃº autÃ³kra illesztettÃ¼k
+# (a filter fÃ¼ggvÃ©nnyel majd kÃ©sÅ‘bb foglalkozunk)
 
 ## 5.1 Gyakorlas - geometriai objektumok  ----------------
 
-# 1) Melyik geom_ függvényt használnád... 
-#    vonaldiagram, boxplot, hisztogram készítéséhez?
+# 1) Melyik geom_ fÃ¼ggvÃ©nyt hasznÃ¡lnÃ¡d... 
+#    vonaldiagram, boxplot, hisztogram kÃ©szÃ­tÃ©sÃ©hez?
 
 ggplot(data = mpg, mapping = aes(x = hwy)) + 
   geom_histogram(binwidth = 1)
 
-# 2) A kód futtatása elõtt írd le szavakkal, hogy fog kinézni az ábra!
+# 2) A kÃ³d futtatÃ¡sa elÅ‘tt Ã­rd le szavakkal, hogy fog kinÃ©zni az Ã¡bra!
 
 ggplot(data = mpg, mapping = aes(x = displ, y = hwy, color = drv)) + 
   geom_point() + 
   geom_smooth(se = FALSE)
 
-# 3) A kód futtatása nélkül mondd meg, lesz-e különbség a két ábra között!
-# Miért / miért nem?
+# 3) A kÃ³d futtatÃ¡sa nÃ©lkÃ¼l mondd meg, lesz-e kÃ¼lÃ¶nbsÃ©g a kÃ©t Ã¡bra kÃ¶zÃ¶tt!
+# MiÃ©rt / miÃ©rt nem?
 
 ggplot(data = mpg, mapping = aes(x = displ, y = hwy)) + 
   geom_point() + 
