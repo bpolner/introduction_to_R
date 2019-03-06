@@ -2,11 +2,11 @@
 
 
 library(tidyverse)
+library(nycflights13)
 
 
 #### 0. Elokeszuletek es alapok ----------------------------------------------
 
-library(nycflights13)
 
 flights
 # valtozok nevei alatti roviditesek jelzik a valtozok tipusat
@@ -29,9 +29,9 @@ flights
 # Műveletek csoportonként: group_by().
 
 # Működésük: 
-# Első argumentum mindig az adat (data.frame)
+# Első argumentum mindig egy adattábla (data.frame)
 # Következő argumentumok: mit tegyünk az adattal, melyik változókkal (idézőjel nélkül)
-# Eredményül mindig egy adatot (data.frame) kapunk vissza
+# Eredményül mindig egy adattáblát (data.frame) kapunk vissza
 
 
 #### 1. Sorok szurese: filter()  --------------------------------
@@ -185,6 +185,10 @@ select(flights, contains("arr_") )
 
 rename(flights, tail_num = tailnum)
 
+# Kiválasztás közben is átnevezhetjük az oszlopokat:
+
+select(flights, tail_num = tailnum)
+
 # Ha nehany valtozot az adattábla elejere akarunk tenni, az összes 
 # többit meg csak egyben megfogni: everything()
 
@@ -194,11 +198,10 @@ select(flights, time_hour, air_time, everything())
 
 # 3.1 Gyakorlás: select() -------------------------------------------------
 
-# 1) Tedd a flights adattábla azon oszlopait, melyekben késéssel 
+# 1) Tedd előre a flights adattábla azon oszlopait, melyekben késéssel 
 # kapcsolatos információ van! Utána következzenek azok az oszlopok, 
 # amelyek nevében szerepel a "time"! A táblából vedd ki a légitársaság, a 
 # járat, és a gép azonosítóit, illetve az induló- és a célállomást!
-
 
 
 #### 4. Uj valtozok szamolasa: mutate() --------------------------------------
@@ -247,7 +250,7 @@ transmute(
 
 # mutate()-n belül bármilyen vektorizált függvény használható
 # (azaz bemenete vektor és egyező hosszúságú vektort ad vissza)
-# Bővebben: http://r4ds.had.co.nz/transform.html#select-columns-with-select 5.5.1
+# Bővebben: https://r4ds.had.co.nz/transform.html#add-new-variables-with-mutate 5.5.1
 
 # 4.1 Gyakorlás: mutate() -------------------------------------------------
 
@@ -277,6 +280,9 @@ class(by_day)
 
 ## 5.1 Tobb muvelet osszekotese a pipe (%>%) hasznalataval  -------------------
 
+# Hogyan függ össze a célállomásonkénti átlagos késés azza, hogy milyen messze van a célállomás?
+# Csak azokat a célállomásokat vegyük figyelembe, amelyeknél több, mint 20 járatról vannak adataink!
+# Honolulut (HNL) ne vegyük figyelembe! 
 
 by_dest <- group_by(flights, dest)
 
@@ -341,7 +347,8 @@ not_cancelled %>%
 
 # Nezzuk meg gepenkent (tailnum) az atl. indulasi kesest!
 
-delays <- not_cancelled %>% 
+delays <- 
+  not_cancelled %>% 
   group_by(tailnum) %>% 
   summarise(
     delay = mean(arr_delay)
@@ -404,12 +411,19 @@ not_cancelled %>%
 quantile(1:6, probs = 0.33)
 ?max
 
+# Keressük meg minden napra az első és utolsó indulás idejét!
+
 not_cancelled %>% 
   group_by(year, month, day) %>% 
   summarise(
     first = min(dep_time),
     last = max(dep_time)
   )
+
+not_cancelled %>% 
+  group_by(year, month, day) %>% 
+  mutate(r = min_rank(dep_time)) %>% 
+  filter(r %in% range(r))
 
 # Darabszam
 
@@ -426,22 +440,45 @@ not_cancelled %>%
 not_cancelled %>% 
   count(dest)
 
-# Sulyozassal - mekkora tavolsagot repultek az egyes celallomasokra osszesen?
+# Sulyozassal - hány mérföldet repultek az egyes celallomasokra osszesen?
 
 not_cancelled %>% 
   count(dest, wt = distance)
 
-# Feltetelnek megfelelo esetek mennyisege 
+# Feltetelnek megfelelo esetek száma és aránya, pl.:  
+# Az egyes napokon hány járat indult 5:00 előtt?
 
 not_cancelled %>% 
   group_by(year, month, day) %>% 
   summarise(n_early = sum(dep_time < 500))
 
+# Mi történt? 
+# Amikor numerikus bemenetet váró függvényeknek logikai értékeket adunk, 
+# akkor IGAZ = 1 és HAMIS = 0
+
+# Az adott hónapban a gépek hány %-a indult 20:00 után?
+
+
+
+
+# Csoportosítás több változó mentén
+
+daily <- group_by(flights, year, month, day)
+
+# több summarise-zal fokozatosan lehet felgöngyölni az adattáblát
+
+(per_day   <- summarise(daily, flights = n())) # ez már csak év és hónap szerint van csoportosítva!
+
+(per_month <- summarise(per_day, flights = sum(flights))) # ez pedig már csak év szerint! 
+
+(per_year  <- summarise(per_month, flights = sum(flights))) 
+
+
 # Csoportositas megszuntetese
 
 daily %>% 
-  ungroup() %>%             # no longer grouped by date
-  summarise(flights = n())  # all flights
+  ungroup() %>%             # megszűnt a csoportosítás
+  summarise(flights = n())  # összes járat számát kapjuk vissza
 
 
 # 5.3 Gyakorlás: summarise() ----------------------------------------------
@@ -458,8 +495,7 @@ not_cancelled %>%
 
 
 # 2) A törölt járatok meghatározása (is.na(dep_delay) | is.na(arr_delay) ) 
-# nem a legoptimálisabb. Miért? Melyik oszlop a legfontosabb?
-
+# nem a legoptimálisabb. Miért? 
 
 
 # 3) Nézd meg a hónap napjai szerinti bontásban a lemondott járatok számát.
