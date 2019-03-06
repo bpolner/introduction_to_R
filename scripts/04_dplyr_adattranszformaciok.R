@@ -26,39 +26,39 @@ flights
 # Letezo valtozok alapjan uj valtozok szamolasa: mutate().
 # Egy osszefoglalo szamolasa sok ertekbol: summarise().
 
-# Mûveletek csoportonként: group_by().
+# MÅ±veletek csoportonkÃ©nt: group_by().
 
-# Mûködésük: 
-# Elsõ argumentum mindig az adat (data.frame)
-# Következõ argumentumok: mit tegyünk az adattal, melyik változókkal (idézõjel nélkül)
-# Eredményül mindig egy adatot (data.frame) kapunk vissza
+# MÅ±kÃ¶dÃ©sÃ¼k: 
+# ElsÅ‘ argumentum mindig az adat (data.frame)
+# KÃ¶vetkezÅ‘ argumentumok: mit tegyÃ¼nk az adattal, melyik vÃ¡ltozÃ³kkal (idÃ©zÅ‘jel nÃ©lkÃ¼l)
+# EredmÃ©nyÃ¼l mindig egy adatot (data.frame) kapunk vissza
 
 
 #### 1. Sorok szurese: filter()  --------------------------------
 
-# 1. arg.: adat, következõ arg.(ok): szûrési feltételek kifejezése
+# 1. arg.: adat, kÃ¶vetkezÅ‘ arg.(ok): szÅ±rÃ©si feltÃ©telek kifejezÃ©se
 
 # Jaratok jan. elsejen:
 
 filter(flights, month == 1, day == 1)
 
-# A dplyr függvények sosem módosítják a bemenetet. 
-# Az eredmény tárolásához hozzá kell rendeljük egy változóhoz: 
+# A dplyr fÃ¼ggvÃ©nyek sosem mÃ³dosÃ­tjÃ¡k a bemenetet. 
+# Az eredmÃ©ny tÃ¡rolÃ¡sÃ¡hoz hozzÃ¡ kell rendeljÃ¼k egy vÃ¡ltozÃ³hoz: 
 
 jan1 <- filter(flights, month == 1, day == 1)
 
-# Egyszerre taroljuk, es nezzuk is meg a szûrés eredményét
+# Egyszerre taroljuk, es nezzuk is meg a szÅ±rÃ©s eredmÃ©nyÃ©t
 
 (dec25 <- filter(flights, month == 12, day == 25))
 
 # Osszehasonlitasok logikai operatorokkal:
 # < , > , <= , >= , != , ==
 
-# Vigyazat! Logikai vizsgálathoz kettõ egyenlõségjel kell!
+# Vigyazat! Logikai vizsgÃ¡lathoz kettÅ‘ egyenlÅ‘sÃ©gjel kell!
 
 filter(flights, month = 1)
 
-# Anomáliák a == használata során:
+# AnomÃ¡liÃ¡k a == hasznÃ¡lata sorÃ¡n:
 
 sqrt(2)^2 == 2
 1/49 * 49 == 1
@@ -69,48 +69,48 @@ sqrt(2)^2 == 2
 near(sqrt(2)^2, 2)
 near(1 / 49 * 49, 1)
 
-# Szûrési feltételek kombinálása logikai operátorokkal:
+# SzÅ±rÃ©si feltÃ©telek kombinÃ¡lÃ¡sa logikai operÃ¡torokkal:
 # http://r4ds.had.co.nz/diagrams/transform-logical.png 
 # & , | , ! , xor
 
 filter(flights, month == 11 | month == 12 | month == 3 | month == 1)
 
 # Tobb lehetseges ertek felsorolasa roviden (a fentivel ekvivalens)
-# (month értéke eleme a vektorral megadott halmaznak)
+# (month Ã©rtÃ©ke eleme a vektorral megadott halmaznak)
 
 nov_dec <- filter(flights, month %in% c(11, 12, 3, 1))
 
 
-# A hiányzó értékek (NA) megkeseríthetik az életünket, 
-# ha összehasonlításokat végzünk
+# A hiÃ¡nyzÃ³ Ã©rtÃ©kek (NA) megkeserÃ­thetik az Ã©letÃ¼nket, 
+# ha Ã¶sszehasonlÃ­tÃ¡sokat vÃ©gzÃ¼nk
 
 NA > 5
 10 == NA
 NA + 10
 NA / 2
 
-# Ami igazán zavarbaejtõ:
+# Ami igazÃ¡n zavarbaejtÅ‘:
 
 NA == NA
 
   
-# Kontextusba helyezve könnyebben érthetõ:
-# Legyen x Anna életkora, ami nem ismert
+# Kontextusba helyezve kÃ¶nnyebben Ã©rthetÅ‘:
+# Legyen x Anna Ã©letkora, ami nem ismert
 
 x <- NA
 
-# Legyen y Béla életkora, ami szintén nem ismert
+# Legyen y BÃ©la Ã©letkora, ami szintÃ©n nem ismert
 
 y <- NA
 
-# Egyidõs Anna és Béla?
+# EgyidÅ‘s Anna Ã©s BÃ©la?
 
 x == y
 
 # Nem tudhatjuk!
 
 
-# Hiányzik-e az adott érték: is.na()
+# HiÃ¡nyzik-e az adott Ã©rtÃ©k: is.na()
 
 is.na(x)
 
@@ -185,26 +185,26 @@ select(flights, contains("arr_") )
 
 rename(flights, tail_num = tailnum)
 
-# Ha nehany valtozot az adattábla elejere akarunk tenni, az összes 
-# többit meg csak egyben megfogni: everything()
+# Ha nehany valtozot az adattÃ¡bla elejere akarunk tenni, az Ã¶sszes 
+# tÃ¶bbit meg csak egyben megfogni: everything()
 
 select(flights, time_hour, air_time, everything())
 
 
 
-# 3.1 Gyakorlás: select() -------------------------------------------------
+# 3.1 GyakorlÃ¡s: select() -------------------------------------------------
 
-# 1) Tedd a flights adattábla azon oszlopait, melyekben késéssel 
-# kapcsolatos információ van! Utána következzenek azok az oszlopok, 
-# amelyek nevében szerepel a "time"! A táblából vedd ki a légitársaság, a 
-# járat, és a gép azonosítóit, illetve az induló- és a célállomást!
+# 1) Tedd a flights adattÃ¡bla azon oszlopait, melyekben kÃ©sÃ©ssel 
+# kapcsolatos informÃ¡ciÃ³ van! UtÃ¡na kÃ¶vetkezzenek azok az oszlopok, 
+# amelyek nevÃ©ben szerepel a "time"! A tÃ¡blÃ¡bÃ³l vedd ki a lÃ©gitÃ¡rsasÃ¡g, a 
+# jÃ¡rat, Ã©s a gÃ©p azonosÃ­tÃ³it, illetve az indulÃ³- Ã©s a cÃ©lÃ¡llomÃ¡st!
 
 
 
 #### 4. Uj valtozok szamolasa: mutate() --------------------------------------
 
-# Válasszunk ki néhány oszlopot, hogy a konzolon is jól lássuk, 
-# mi történik!
+# VÃ¡lasszunk ki nÃ©hÃ¡ny oszlopot, hogy a konzolon is jÃ³l lÃ¡ssuk, 
+# mi tÃ¶rtÃ©nik!
 
 flights_sml <- 
   select(
@@ -225,7 +225,7 @@ mutate(
 )
 
 
-# Egy mutate-n belül utalhatunk akar az eppen letrehozott valtozokra is!
+# Egy mutate-n belÃ¼l utalhatunk akar az eppen letrehozott valtozokra is!
 
 mutate(
   flights_sml,
@@ -235,7 +235,7 @@ mutate(
 )
 
 
-# transmute: ha csak a létrehozott változókat akarod visszakapni:
+# transmute: ha csak a lÃ©trehozott vÃ¡ltozÃ³kat akarod visszakapni:
 
 transmute(
   flights,
@@ -245,26 +245,26 @@ transmute(
 )
 
 
-# mutate()-n belül bármilyen vektorizált függvény használható
-# (azaz bemenete vektor és egyezõ hosszúságú vektort ad vissza)
-# Bõvebben: http://r4ds.had.co.nz/transform.html#select-columns-with-select 5.5.1
+# mutate()-n belÃ¼l bÃ¡rmilyen vektorizÃ¡lt fÃ¼ggvÃ©ny hasznÃ¡lhatÃ³
+# (azaz bemenete vektor Ã©s egyezÅ‘ hosszÃºsÃ¡gÃº vektort ad vissza)
+# BÅ‘vebben: http://r4ds.had.co.nz/transform.html#select-columns-with-select 5.5.1
 
-# 4.1 Gyakorlás: mutate() -------------------------------------------------
+# 4.1 GyakorlÃ¡s: mutate() -------------------------------------------------
 
-# Számold ki újra az indulási és érkezési késést!
+# SzÃ¡mold ki Ãºjra az indulÃ¡si Ã©s Ã©rkezÃ©si kÃ©sÃ©st!
 
 
 
-#### 5. Összefoglalások: summarise() ----------------------------
+#### 5. Ã–sszefoglalÃ¡sok: summarise() ----------------------------
 
-# A summarise() bemenete egy adattábla (data.frame), és visszaad egyetlen sort!
+# A summarise() bemenete egy adattÃ¡bla (data.frame), Ã©s visszaad egyetlen sort!
 
 summarise(
   flights, 
   delay = mean(dep_delay, na.rm = TRUE)
 )
 
-# Akkor igazán hasznos, ha a group_by()-al egyutt hasznaljuk
+# Akkor igazÃ¡n hasznos, ha a group_by()-al egyutt hasznaljuk
 
 by_day <- group_by(flights, year, month, day)
 summarise(by_day, delay = mean(dep_delay, na.rm = TRUE))
@@ -294,8 +294,8 @@ ggplot(data = delay, mapping = aes(x = dist, y = delay)) +
   geom_point(aes(size = count), alpha = 1/3) +
   geom_smooth(se = FALSE)
 
-# Ez most 4 lepes volt: adatok csoportositasa, osszegzes, szures, majd ábrázolás.
-# A koztes adattáblák foloslegesek, jo lenne kihagyni oket.
+# Ez most 4 lepes volt: adatok csoportositasa, osszegzes, szures, majd Ã¡brÃ¡zolÃ¡s.
+# A koztes adattÃ¡blÃ¡k foloslegesek, jo lenne kihagyni oket.
 
 flights %>% 
   group_by(dest) %>% 
@@ -313,22 +313,22 @@ flights %>%
 # %>% beszurasahoz Ctrl + Shift + M 
 # Mit csinal a %>% ?
 # x %>% f(y) = f(x, y)
-# Olvashatjuk úgy is, hogy %>% = "aztán": 
-# csoportosítsd, AZTÁN összegezd, AZTÁN szûrd, AZTÁN ábrázold
+# Olvashatjuk Ãºgy is, hogy %>% = "aztÃ¡n": 
+# csoportosÃ­tsd, AZTÃN Ã¶sszegezd, AZTÃN szÅ±rd, AZTÃN Ã¡brÃ¡zold
 
 # Hianyzo adatok szurese
 
-# Mire volt jó fentebb az na.rm = TRUE?
+# Mire volt jÃ³ fentebb az na.rm = TRUE?
 
 flights %>% 
   group_by(year, month, day) %>% 
   summarise(mean = mean(dep_delay))
 
-# Az aggregációs függvényekre is érvényes:
-# ha hiányos adatsort kapnak, NA-t adnak vissza
+# Az aggregÃ¡ciÃ³s fÃ¼ggvÃ©nyekre is Ã©rvÃ©nyes:
+# ha hiÃ¡nyos adatsort kapnak, NA-t adnak vissza
 
-# A flights adattáblában a hianyzo keses a lemondott jaratoknal szerepel
-# Egy megoldás lehet, ha kihajítjuk ezeket a sorokat:
+# A flights adattÃ¡blÃ¡ban a hianyzo keses a lemondott jaratoknal szerepel
+# Egy megoldÃ¡s lehet, ha kihajÃ­tjuk ezeket a sorokat:
   
 not_cancelled <- flights %>% 
   filter(!is.na(dep_delay), !is.na(arr_delay))
@@ -352,7 +352,7 @@ ggplot(data = delays, mapping = aes(x = delay)) +
 
 # Van olyan gep, ahol az ATLAG indulasi keses ~5 ora!
 
-# Aggregációknál érdemes megnézni, hány megfigyelést összegeztünk.
+# AggregÃ¡ciÃ³knÃ¡l Ã©rdemes megnÃ©zni, hÃ¡ny megfigyelÃ©st Ã¶sszegeztÃ¼nk.
 # Hany ut alapjan lett az atlag keses megallapitva?
 
 delays <- not_cancelled %>% 
@@ -365,11 +365,11 @@ delays <- not_cancelled %>%
 ggplot(data = delays, mapping = aes(x = n, y = delay)) + 
   geom_point(alpha = 1/10)
 
-# Jellemzõ mintázat: mintanagyság növekedésével csökken az összegzõ statisztika szóródása
+# JellemzÅ‘ mintÃ¡zat: mintanagysÃ¡g nÃ¶vekedÃ©sÃ©vel csÃ¶kken az Ã¶sszegzÅ‘ statisztika szÃ³rÃ³dÃ¡sa
 # Aggregalasnal mindig erdemes rogziteni az esetek szamat: 
 # n() vagy sum(!is.na())
 
-# Szûrjük a kevés megfigyelésen alapuló átlagokat, és aztán ábrázoljunk
+# SzÅ±rjÃ¼k a kevÃ©s megfigyelÃ©sen alapulÃ³ Ã¡tlagokat, Ã©s aztÃ¡n Ã¡brÃ¡zoljunk
 
 delays %>% 
   filter(n > 25) %>% 
@@ -382,7 +382,7 @@ not_cancelled %>%
   group_by(year, month, day) %>% 
   summarise(
     avg_delay1 = mean(arr_delay),
-    avg_delay2 = mean(arr_delay[arr_delay > 0]) # az átlagos pozitív késés
+    avg_delay2 = mean(arr_delay[arr_delay > 0]) # az Ã¡tlagos pozitÃ­v kÃ©sÃ©s
   )
 
 
@@ -413,7 +413,7 @@ not_cancelled %>%
 
 # Darabszam
 
-?n # darabszám
+?n # darabszÃ¡m
 ?n_distinct # egyedi esetek
 
 not_cancelled %>% 
@@ -444,10 +444,10 @@ daily %>%
   summarise(flights = n())  # all flights
 
 
-# 5.3 Gyakorlás: summarise() ----------------------------------------------
+# 5.3 GyakorlÃ¡s: summarise() ----------------------------------------------
 
 
-# 1) Hozz létre a lentiek eredményét a count() használata nélkül!
+# 1) Hozz lÃ©tre a lentiek eredmÃ©nyÃ©t a count() hasznÃ¡lata nÃ©lkÃ¼l!
 
 not_cancelled %>% 
   count(dest)
@@ -457,68 +457,68 @@ not_cancelled %>%
   count(tailnum, wt = distance)
 
 
-# 2) A törölt járatok meghatározása (is.na(dep_delay) | is.na(arr_delay) ) 
-# nem a legoptimálisabb. Miért? Melyik oszlop a legfontosabb?
+# 2) A tÃ¶rÃ¶lt jÃ¡ratok meghatÃ¡rozÃ¡sa (is.na(dep_delay) | is.na(arr_delay) ) 
+# nem a legoptimÃ¡lisabb. MiÃ©rt? Melyik oszlop a legfontosabb?
 
 
 
-# 3) Nézd meg a hónap napjai szerinti bontásban a lemondott járatok számát.
-# Látsz-e valamilyen mintázatot? 
-# A lemondott járatok aránya összefügg-e az átlagos késéssel?
+# 3) NÃ©zd meg a hÃ³nap napjai szerinti bontÃ¡sban a lemondott jÃ¡ratok szÃ¡mÃ¡t.
+# LÃ¡tsz-e valamilyen mintÃ¡zatot? 
+# A lemondott jÃ¡ratok arÃ¡nya Ã¶sszefÃ¼gg-e az Ã¡tlagos kÃ©sÃ©ssel?
 
 
 
-# 4) Melyik légitársaság (carrier) késik a legtöbbet? 
-# El tudjuk-e különíteni a rossz repterek vs. a rossz légitársaságok
-# hatását? Miért / miért nem?
+# 4) Melyik lÃ©gitÃ¡rsasÃ¡g (carrier) kÃ©sik a legtÃ¶bbet? 
+# El tudjuk-e kÃ¼lÃ¶nÃ­teni a rossz repterek vs. a rossz lÃ©gitÃ¡rsasÃ¡gok
+# hatÃ¡sÃ¡t? MiÃ©rt / miÃ©rt nem?
 # (Tipp: flights %>% group_by(carrier, dest) %>% summarise(n()))
 
 
 
-# 6. Haladó dplyr ------------------------------------------------------------
+# 6. HaladÃ³ dplyr ------------------------------------------------------------
 
 
-# 6.1 Több oszlop transzformálása röviden ----
+# 6.1 TÃ¶bb oszlop transzformÃ¡lÃ¡sa rÃ¶viden ----
 
 # http://dplyr.tidyverse.org/reference/summarise_all.html 
 
 
-# 1) Az összes oszlopra:
+# 1) Az Ã¶sszes oszlopra:
 
 iris %>% 
   group_by(Species) %>% 
   summarise_all(median)
 
-# Több összefoglalás egyszerre:
+# TÃ¶bb Ã¶sszefoglalÃ¡s egyszerre:
 
-# a) függvények felsorolása a funs()-on belül
+# a) fÃ¼ggvÃ©nyek felsorolÃ¡sa a funs()-on belÃ¼l
 
 iris %>% 
   group_by(Species) %>% 
   summarise_all(funs(median, mean))
 
-# b) függvények nevének megadása karaktervektorban
+# b) fÃ¼ggvÃ©nyek nevÃ©nek megadÃ¡sa karaktervektorban
 
 iris %>% 
   group_by(Species) %>% 
   summarise_all(c("median", "mean"))
 
 
-# 2) Megadott feltételtõl függõen:
+# 2) Megadott feltÃ©teltÅ‘l fÃ¼ggÅ‘en:
 
-# Átlag számítása az összes valós számot tartalmazó oszlopra
+# Ãtlag szÃ¡mÃ­tÃ¡sa az Ã¶sszes valÃ³s szÃ¡mot tartalmazÃ³ oszlopra
 
 flights %>% 
   summarise_if(is.double, mean, na.rm = TRUE)
 
-# Karaktereket tartalmazó változók faktorrá alakítása
+# Karaktereket tartalmazÃ³ vÃ¡ltozÃ³k faktorrÃ¡ alakÃ­tÃ¡sa
 
 flights %>% 
   mutate_if(is.character, as.factor)
 
-# 3) Oszlopok neve alapján:
+# 3) Oszlopok neve alapjÃ¡n:
 
-# a) select()-ben használt módszerrel a vars()-on belül (segédfüggvények is mûködnek!)
+# a) select()-ben hasznÃ¡lt mÃ³dszerrel a vars()-on belÃ¼l (segÃ©dfÃ¼ggvÃ©nyek is mÅ±kÃ¶dnek!)
 
 flights %>%
   summarise_at(vars(dep_time:arr_time), max, na.rm = T)
@@ -532,9 +532,9 @@ flights %>%
   summarise_at(c("arr_delay", "dep_delay"), mean, na.rm = TRUE)
 
 
-# 6.2 Mûveletek es szûrõk csoportosítással ----
+# 6.2 MÅ±veletek es szÅ±rÅ‘k csoportosÃ­tÃ¡ssal ----
 
-# Minden napra a 3 legtöbbet késõ járat kikeresése:
+# Minden napra a 3 legtÃ¶bbet kÃ©sÅ‘ jÃ¡rat kikeresÃ©se:
 
 flights_sml %>% 
   group_by(year, month, day) %>%
@@ -542,7 +542,7 @@ flights_sml %>%
 
 
 # Kuszobnel nagyobb csoportok meghatarozasa
-# Pl. csak a népszerû célállomások:
+# Pl. csak a nÃ©pszerÅ± cÃ©lÃ¡llomÃ¡sok:
 
 popular_dests <- 
   flights %>% 
