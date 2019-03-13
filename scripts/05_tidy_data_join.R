@@ -220,7 +220,7 @@ stocks <- tibble(
     return = c(1.88, 0.59, 0.35,   NA, 0.92, 0.17, 2.66)
 )
 
-# Masfajta reprezentacio explicitte teheti az osszes hianyzo adatot
+# Másfajta elrendezés explicitté teheti az összes hiányzó adatot
 
 stocks %>% 
     spread(year, return)
@@ -275,7 +275,7 @@ treatment %>%
 
 # 2. Adattablak kapcsolasa ------------------------------------------------
 
-require(nycflights13)
+library(nycflights13)
 
 # Az adataink gyakran több adattáblában vannak.
 # Pl. jegyzőkonyv + kísérleti eredmények + kérdőívek. 
@@ -320,13 +320,10 @@ weather %>%
 # Előfordulhat, hogy egy táblában nincs elsődleges kulcs!
 # A járatszám / gép sorszáma + dátum elsődleges kulcs a flights táblában? 
 
-flights %>% 
-  count(year, month, day, flight) %>% 
-  filter(n > 1)
 
-flights %>% 
-  count(year, month, day, tailnum) %>% 
-  filter(n > 1)
+
+
+
 
 # Ilyenkor célszerű létrehozni minden megfigyelésnek egy sorszámot 
 # (mesterséges/helyettesítő kulcs  = surrogate key)
@@ -367,31 +364,31 @@ flights2 %>%
 # A kapcsolások alapjait ezeken az egyszerű táblákon fogjuk szemlélteni:
 
 x <- tribble(
-    ~key, ~val_x,
-    1, "x1",
-    2, "x2",
-    3, "x3"
+    ~nev, ~kor,
+    "Anna", "20",
+    "Béla", "30",
+    "Csaba", "40"
 )
 
 y <- tribble(
-    ~key, ~val_y,
-    1, "y1",
-    2, "y2",
-    4, "y3"
+    ~nev, ~macska,
+    "Anna", 0,
+    "Béla", 4,
+    "Dávid", 1
 )
 
 z <- tribble(
-    ~key, ~val_z,
-    1, "z1",
-    2, "z2",
-    5, "z3"
+    ~nev, ~kedvenc_szine,
+    "Anna", "kék",
+    "Béla", "piros",
+    "Zsuzsi", "szürke"
 )
 
 # Inner join
 # Csak a mindkét táblában meglévő megfigyeléseket tartja meg
 
 x %>% 
-    inner_join(y, by = "key")
+    inner_join(y, by = "nev")
 
 # Outer join
 # Akkor tart meg egy megfigyelést, 
@@ -401,17 +398,17 @@ x %>%
 # left_join(): az összes bal oldali táblában meglévő megfigyelést megtartja
 
 x %>% 
-    left_join(y,  by = "key") 
+    left_join(y,  by = "nev") 
 
 # right_join(): a jobb oldali táblából tartja meg az összes megfigyelést
 
 x %>% 
-    right_join(y, by = "key") 
+    right_join(y, by = "nev") 
 
 # full_join(): mindkét tábla összes megfigyelését megtartja
 
 x %>% 
-    full_join(y, by = "key")
+    full_join(y, by = "nev")
 
 # join-ok Venn-diagramon: http://r4ds.had.co.nz/diagrams/join-venn.png 
 
