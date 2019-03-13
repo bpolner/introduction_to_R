@@ -140,7 +140,7 @@ people <- tribble(
   "Phillip Woods",   "height",   186, 
   "Phillip Woods",   "age",       50, 
   "Jessica Cordero", "age",       37, 
-  "Jessica Cordero", "height",   156, 
+  "Jessica Cordero", "height",   156
 )
 
 
