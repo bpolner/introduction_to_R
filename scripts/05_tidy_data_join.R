@@ -419,40 +419,42 @@ x %>%
 # egy-kapcsolódik-sokhoz (pl. járatok-repterek)
 
 x <- tribble(
-    ~key, ~val_x,
-    1, "x1",
-    2, "x2",
-    2, "x3",
-    1, "x4"
-)
-y <- tribble(
-    ~key, ~val_y,
-    1, "y1",
-    2, "y2"
+    ~nev, ~mai_ebed,
+    "Anna", "rakott krumpli",
+    "Béla", "tökfőzelék",
+    "Béla", "pörkölt",
+    "Anna", "szendvics"
 )
 
-left_join(x, y, by = "key")
+y <- tribble(
+    ~nev, ~uni,
+    "Anna", "BME",
+    "Béla", "ELTE"
+)
+
+left_join(x, y, by = "nev")
 
 # B) Mindket tablaban duplan van egy kulcs: 
 # ez altalaban hiba, mert a kulcs egyik táblában sem elsődleges.
 # Ha ezeket egyesitjuk, az osszes lehetseges kombinaciot megkapjuk
 
 x <- tribble(
-    ~key, ~val_x,
-    1, "x1",
-    2, "x2",
-    2, "x3",
-    3, "x4"
-)
-y <- tribble(
-    ~key, ~val_y,
-    1, "y1",
-    2, "y2",
-    2, "y3",
-    3, "y4"
+    ~nev, ~kor,
+    "Anna", "20",
+    "Béla", "30",
+    "Béla", "50",
+    "Csaba", "40"
 )
 
-left_join(x, y, by = "key")
+y <- tribble(
+    ~nev, ~testtomeg,
+    "Anna",  "60",
+    "Béla",  "80",
+    "Béla",  "100",
+    "Csaba", "90"
+)
+
+left_join(x, y, by = "nev")
 
 # Kulcsok meghatarozasa *_join() fuggvenyek by argumentuma
 
@@ -484,24 +486,9 @@ flights2 %>%
 
 # 1) Van-e összefüggés egy repülőgép életkora és a késései között?
 
-flights %>%
-  # Mennyit szokott késni egy gép?
-  group_by(tailnum) %>%  
-  summarise(
-    avg_arr_delay = mean(arr_delay, na.rm = TRUE)
-  ) %>% 
-  # Táblák kapcsolása - mi a kulcs?
-  left_join(planes, key = "tailnum") %>% 
-  # Számoljuk ki, hogy hány éves a gép?
-  mutate(
-    plane_age = 2013-year
-  ) %>% 
-  # Válasszuk ki csak a fontos változókat!
-  select(tailnum, avg_arr_delay, plane_age) %>% 
-  # Készítsünk egy pontfelhőt trendvonallal!
-  ggplot(aes(x = plane_age, y = avg_arr_delay)) + 
-  geom_point(alpha = 0.07) + 
-  geom_smooth()
+
+
+
 
   
 
