@@ -131,6 +131,18 @@ stocks %>%
   spread(year, return) %>% 
   gather("year", "return", `2015`:`2016`)
 
+# 3) Miért nem lehet szétteríteni ezt a táblát? Mit kellene tenni, hogy lehessen
+
+people <- tribble(
+  ~name,             ~key,    ~value, 
+  #-----------------|--------|------
+  "Phillip Woods",   "age",       45, 
+  "Phillip Woods",   "height",   186, 
+  "Phillip Woods",   "age",       50, 
+  "Jessica Cordero", "age",       37, 
+  "Jessica Cordero", "height",   156, 
+)
+
 
 # 1.2 Elválasztás es egyesítés --------------------------------------------
 
