@@ -17,7 +17,7 @@ table4a; table4b
 # 2. Minden megfigyeles kulon sor
 # 3. Minden ertek kulon cella
 
-# A fenti 4 pelda kozul melyik tekintheto rendezettnek?
+# A fenti 4 pelda kozul melyik tekintheto tidy-nak (rendezettnek)?
 
 # Konzisztensen rendezett adatok segitik altalanos elvek alkalmazasat,
 # amikor az adatokkal dolgozunk
@@ -40,7 +40,6 @@ ggplot(table1, aes(year, cases)) +
 # az ábrát table2, ill. table4a és table4b alapján?
 
 
-
 # 1.1 Szetterites es osszegyujtes -------------------------------------------
 
 # Az adatok sajnos a legtöbbször nincsenek tidy formátumba rendezve.
@@ -48,9 +47,12 @@ ggplot(table1, aes(year, cases)) +
 # Sokan nem ismerik, és nem evidens
 # Az adatok rendezése sokszor nem az elemzést, hanem a bevitelt segíti
 
-# 1.: Mik a változók és a megfigyelések?
 
-# 2.: Két problémát kell megoldani:
+# Hogyan tudjuk tidy formátumba rendezni az adatokat?
+
+# 1. lépés: Mik a változók és a megfigyelések?
+
+# 2. lépés: Két probléma lehet:
 # - egy változóhoz tartozó adatok több oszlopban lehetnek
 # - egy megfigyelés több sorba is szét lehet szóródva
 # Általában egyszerre csak az egyik áll fenn.
@@ -96,7 +98,7 @@ left_join(tidy4a, tidy4b)
 
 table2
 
-# Most kettő fontos paraméter:
+# Most két dolog fontos:
 # - Melyik az az oszlop, amelyik a változók neveit tartalmazza? (key)
 # - Melyik az az oszlop, ami több változó értékeit is tartalmazza? (value)
 
@@ -116,8 +118,6 @@ preg <- tribble(
     "no",      20,    12
 )
 
-preg %>% 
-  gather(male, female, key = "nem", value = "darabszam")
 
 
 # 1.2 Elválasztás es egyesítés --------------------------------------------
