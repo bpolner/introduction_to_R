@@ -5,7 +5,7 @@ library(tidyverse)
 
 # 1. Adatrendezes (tidy data) ---------------------------------------------
 
-# Ugyanaz az adat tobbfelekeppen is tárolható
+# Ugyanaz az adat tobbfelekeppen is tÃ¡rolhatÃ³
 
 table1
 table2
@@ -36,51 +36,51 @@ ggplot(table1, aes(year, cases)) +
     geom_line(aes(group = country), colour = "grey50") + 
     geom_point(aes(colour = country))
 
-# Hogyan készítenétek el ugyanezeket a kimutatásokat és
-# az ábrát table2, ill. table4a és table4b alapján?
+# Hogyan kÃ©szÃ­tenÃ©tek el ugyanezeket a kimutatÃ¡sokat Ã©s
+# az Ã¡brÃ¡t table2, ill. table4a Ã©s table4b alapjÃ¡n?
 
 
 
 # 1.1 Szetterites es osszegyujtes -------------------------------------------
 
-# Az adatok sajnos a legtöbbször nincsenek tidy formátumba rendezve.
-# Miért?
-# Sokan nem ismerik, és nem evidens
-# Az adatok rendezése sokszor nem az elemzést, hanem a bevitelt segíti
+# Az adatok sajnos a legtÃ¶bbszÃ¶r nincsenek tidy formÃ¡tumba rendezve.
+# MiÃ©rt?
+# Sokan nem ismerik, Ã©s nem evidens
+# Az adatok rendezÃ©se sokszor nem az elemzÃ©st, hanem a bevitelt segÃ­ti
 
-# 1.: Mik a változók és a megfigyelések?
+# 1.: Mik a vÃ¡ltozÃ³k Ã©s a megfigyelÃ©sek?
 
-# 2.: Két problémát kell megoldani:
-# - egy változóhoz tartozó adatok több oszlopban lehetnek
-# - egy megfigyelés több sorba is szét lehet szóródva
-# Általában egyszerre csak az egyik áll fenn.
+# 2.: KÃ©t problÃ©mÃ¡t kell megoldani:
+# - egy vÃ¡ltozÃ³hoz tartozÃ³ adatok tÃ¶bb oszlopban lehetnek
+# - egy megfigyelÃ©s tÃ¶bb sorba is szÃ©t lehet szÃ³rÃ³dva
+# ÃltalÃ¡ban egyszerre csak az egyik Ã¡ll fenn.
 
-# Ezeket a problémákat orvosolja a tidyr két alapvetõ függvénye:
-# gather() és spread()
+# Ezeket a problÃ©mÃ¡kat orvosolja a tidyr kÃ©t alapvetÅ‘ fÃ¼ggvÃ©nye:
+# gather() Ã©s spread()
   
-# gather (=összegyûjtés): ha az oszlopnevek egy változó értékeit veszik fel
+# gather (=Ã¶sszegyÅ±jtÃ©s): ha az oszlopnevek egy vÃ¡ltozÃ³ Ã©rtÃ©keit veszik fel
 
 table4a
 
-# Három fontos paraméter:
+# HÃ¡rom fontos paramÃ©ter:
 
-# - Melyek az oszlopok, amikben nem változók, hanem értékek vannak?
-# - Mi az a változó, aminek az értékeit a változónevek ebben a táblában? (key)
-# - Mi az a változó, aminek az értékei a cellákban vannak? (value)
+# - Melyek az oszlopok, amikben nem vÃ¡ltozÃ³k, hanem Ã©rtÃ©kek vannak?
+# - Mi az a vÃ¡ltozÃ³, aminek az Ã©rtÃ©keit a vÃ¡ltozÃ³nevek ebben a tÃ¡blÃ¡ban? (key)
+# - Mi az a vÃ¡ltozÃ³, aminek az Ã©rtÃ©kei a cellÃ¡kban vannak? (value)
 
 table4a %>% 
     gather(`1999`, `2000`, key = "year", value = "cases")
 
-# Az oszlopokat úgy határozzuk meg, mint a dplyr::select()-nél.
+# Az oszlopokat Ãºgy hatÃ¡rozzuk meg, mint a dplyr::select()-nÃ©l.
 
 
 # Hasonloan eljarhatunk a table4b eseteben is, csak itt ugye
-# egy másik változó értékei vannak a cellákban, módosítsuk a value paramétert!
+# egy mÃ¡sik vÃ¡ltozÃ³ Ã©rtÃ©kei vannak a cellÃ¡kban, mÃ³dosÃ­tsuk a value paramÃ©tert!
 
 table4b %>% 
     gather(`1999`, `2000`, key = "year", value = "population")
 
-# Ahhoz, hogy egy tibble-be kerüljenek az adataink, hasznaljuk a left_join()-t
+# Ahhoz, hogy egy tibble-be kerÃ¼ljenek az adataink, hasznaljuk a left_join()-t
 
 tidy4a <- table4a %>% 
     gather(`1999`, `2000`, key = "year", value = "cases")
@@ -89,26 +89,26 @@ tidy4b <- table4b %>%
 
 left_join(tidy4a, tidy4b)
 
-# Kicsit késõbb lesz szó a join függvényekrõl is!
+# Kicsit kÃ©sÅ‘bb lesz szÃ³ a join fÃ¼ggvÃ©nyekrÅ‘l is!
 
-# spread (=szétterítés): ha van egy oszlop, 
-# amiben változók nevei szerepelnek
+# spread (=szÃ©tterÃ­tÃ©s): ha van egy oszlop, 
+# amiben vÃ¡ltozÃ³k nevei szerepelnek
 
 table2
 
-# Most kettõ fontos paraméter:
-# - Melyik az az oszlop, amelyik a változók neveit tartalmazza? (key)
-# - Melyik az az oszlop, ami több változó értékeit is tartalmazza? (value)
+# Most kettÅ‘ fontos paramÃ©ter:
+# - Melyik az az oszlop, amelyik a vÃ¡ltozÃ³k neveit tartalmazza? (key)
+# - Melyik az az oszlop, ami tÃ¶bb vÃ¡ltozÃ³ Ã©rtÃ©keit is tartalmazza? (value)
 
 spread(table2, key = type, value = count)
 
-# gather: szélesbõl hosszúba (wide to long)
-# spread: hosszúból szélesbe (long to wide)
+# gather: szÃ©lesbÅ‘l hosszÃºba (wide to long)
+# spread: hosszÃºbÃ³l szÃ©lesbe (long to wide)
 
 
 # 1.1.1 Gyakorlas - spread es gather --------------------------------------
 
-# 1) Rendezd a preg adatokat tidy formátumba!
+# 1) Rendezd a preg adatokat tidy formÃ¡tumba!
 
 preg <- tribble(
     ~pregnant, ~male, ~female,
@@ -120,58 +120,58 @@ preg %>%
   gather(male, female, key = "nem", value = "darabszam")
 
 
-# 1.2 Elválasztás es egyesítés --------------------------------------------
+# 1.2 ElvÃ¡lasztÃ¡s es egyesÃ­tÃ©s --------------------------------------------
 
-# Elõfordulhat az is, hogy egy oszlopban több változó értéke is szerepel!
+# ElÅ‘fordulhat az is, hogy egy oszlopban tÃ¶bb vÃ¡ltozÃ³ Ã©rtÃ©ke is szerepel!
 
 table3
 
-# Ilyenkor jön jól a separate()
+# Ilyenkor jÃ¶n jÃ³l a separate()
 
 table3 %>% 
     separate(rate, into = c("cases", "population"))
 
-# A separate() elvalasztokent azonosítja a nem-alfanumerikus karaktereket.
-# Az elválasztót meg is adhatjuk:
+# A separate() elvalasztokent azonosÃ­tja a nem-alfanumerikus karaktereket.
+# Az elvÃ¡lasztÃ³t meg is adhatjuk:
 
 table3 %>% 
     separate(rate, into = c("cases", "population"), sep = "/")
 
 # Hoppa! A szamok karakterkent kepezodtek le 
-# - mert ugye karakterkent voltak a forrasban, és alapesetben
-# a separate() nem változtatja meg az oszlopok típusát
+# - mert ugye karakterkent voltak a forrasban, Ã©s alapesetben
+# a separate() nem vÃ¡ltoztatja meg az oszlopok tÃ­pusÃ¡t
 # convert=TRUE: megprobalja jobb adattipusra alakitani 
 # az oszlopot az elvalasztas utan
 
 table3 %>% 
     separate(rate, into = c("cases", "population"), convert = TRUE)
 
-# sep argumentumnak egész számokkal azt is megadhatjuk, hogy
-# hány karakterenként vágjon:
+# sep argumentumnak egÃ©sz szÃ¡mokkal azt is megadhatjuk, hogy
+# hÃ¡ny karakterenkÃ©nt vÃ¡gjon:
 
 table3 %>% 
     separate(year, into = c("century", "year"), sep = 2)
 
-# Ez itt most nem túl hasznos, de van, amikor jól jöhet!
+# Ez itt most nem tÃºl hasznos, de van, amikor jÃ³l jÃ¶het!
 
-# unite() (=egyesítés): több oszlopból egy értéket
+# unite() (=egyesÃ­tÃ©s): tÃ¶bb oszlopbÃ³l egy Ã©rtÃ©ket
 
 table5
 
 table5 %>% 
   unite(new, century, year)
 
-# Alapértelmezett szeparátor: _ 
-# Ha nem szeretnénk szeparátort:
+# AlapÃ©rtelmezett szeparÃ¡tor: _ 
+# Ha nem szeretnÃ©nk szeparÃ¡tort:
 
 table5 %>% 
     unite(new, century, year, sep="")
 
 
 
-# 1.2.1 Gyakorlás - elválasztás és egyesítés ------------------------------
+# 1.2.1 GyakorlÃ¡s - elvÃ¡lasztÃ¡s Ã©s egyesÃ­tÃ©s ------------------------------
 
-# 1) Mit tud a separate() extra és fill argumentuma?
+# 1) Mit tud a separate() extra Ã©s fill argumentuma?
 
 tibble(x = c("a,b,c", "d,e,f,g", "h,i,j")) %>% 
   separate(x, c("one", "two", "three"))
@@ -182,11 +182,11 @@ tibble(x = c("a,b,c", "d,e", "f,g,i")) %>%
 
 
 
-# 1.3 Hiányzó adatok  -----------------------------------------------------
+# 1.3 HiÃ¡nyzÃ³ adatok  -----------------------------------------------------
 
-# Hiányzó adatok kétféleképpen lehetnek jelen az adattáblában:
-# - Explicit: NA-val jelölve (a hiány jelenléte)
-# - Implicit: egyszerûen csak nincs meg az adat (a jelenlét hiánya)
+# HiÃ¡nyzÃ³ adatok kÃ©tfÃ©lekÃ©ppen lehetnek jelen az adattÃ¡blÃ¡ban:
+# - Explicit: NA-val jelÃ¶lve (a hiÃ¡ny jelenlÃ©te)
+# - Implicit: egyszerÅ±en csak nincs meg az adat (a jelenlÃ©t hiÃ¡nya)
 
 # A lenti peldaban hol vannak ilyenek?
 
@@ -213,7 +213,7 @@ stocks %>%
   gather(year, return, `2015`:`2016`)
 
 
-# Az implicit hiányzó adatokat explicitté tehetjük a complete()-tal is:
+# Az implicit hiÃ¡nyzÃ³ adatokat explicittÃ© tehetjÃ¼k a complete()-tal is:
 
 stocks %>% 
     complete(year, qtr)
@@ -230,14 +230,14 @@ treatment <- tribble(
     "Katherine Burke",  1,           4
 )
 
-# Ilyenkor használjuk a fill()-t!
+# Ilyenkor hasznÃ¡ljuk a fill()-t!
 
 treatment %>% 
     fill(person)
 
-# Fentrõl lefelé haladva a megadott oszlopban a hiányzó értékeket
-# a legutolsó nem hiányzó értékkel helyettesíti be
-# ("last observation carried forward" módszer)
+# FentrÅ‘l lefelÃ© haladva a megadott oszlopban a hiÃ¡nyzÃ³ Ã©rtÃ©keket
+# a legutolsÃ³ nem hiÃ¡nyzÃ³ Ã©rtÃ©kkel helyettesÃ­ti be
+# ("last observation carried forward" mÃ³dszer)
 
 # fill() .direction argumentuma:
 
@@ -245,29 +245,29 @@ treatment %>%
   fill(person, .direction = "up")
 
 
-# Még a tidy formátumról: www.jstatsoft.org/v59/i10/paper 
-# A nem-tidy formátumokról: https://simplystatistics.org/2016/02/17/non-tidy-data/ 
+# MÃ©g a tidy formÃ¡tumrÃ³l: www.jstatsoft.org/v59/i10/paper 
+# A nem-tidy formÃ¡tumokrÃ³l: https://simplystatistics.org/2016/02/17/non-tidy-data/ 
 
 
 # 2. Adattablak kapcsolasa ------------------------------------------------
 
 require(nycflights13)
 
-# Az adataink gyakran több adattáblában vannak.
-# Pl. jegyzõkonyv + kísérleti eredmények + kérdõívek. 
+# Az adataink gyakran tÃ¶bb adattÃ¡blÃ¡ban vannak.
+# Pl. jegyzÅ‘konyv + kÃ­sÃ©rleti eredmÃ©nyek + kÃ©rdÅ‘Ã­vek. 
 
-# nycflights13 csomagban több tibble is van:
+# nycflights13 csomagban tÃ¶bb tibble is van:
 airlines
 airports
 planes
 weather
 
-# Hogyan kapcsolódnak egymáshoz ezek a táblák?
+# Hogyan kapcsolÃ³dnak egymÃ¡shoz ezek a tÃ¡blÃ¡k?
 # http://r4ds.had.co.nz/diagrams/relational-nycflights.png
 
-# Az adattablakat "kulcsok" (keys) segitsegevel köthetjük össze
-# Kulcs: olyan változó (vagy változóhalmaz), 
-# ami egy megfigyelés azonosítására alkalmas
+# Az adattablakat "kulcsok" (keys) segitsegevel kÃ¶thetjÃ¼k Ã¶ssze
+# Kulcs: olyan vÃ¡ltozÃ³ (vagy vÃ¡ltozÃ³halmaz), 
+# ami egy megfigyelÃ©s azonosÃ­tÃ¡sÃ¡ra alkalmas
 # 
 # Elsodleges (primary) kulcsok: 
 #   egyertelmuen azonositanak egy megfigyelest adott tablan belul
@@ -278,8 +278,8 @@ weather
 # 
 # Egy valtozo lehet egyszerre mindketto is!
 # 
-# Egy elsõdleges kulcs és egy másik tábla idegen kulcsa 
-# együttesen alkotnak egy kapcsolatot
+# Egy elsÅ‘dleges kulcs Ã©s egy mÃ¡sik tÃ¡bla idegen kulcsa 
+# egyÃ¼ttesen alkotnak egy kapcsolatot
 
 # Ha azonositottunk egy elsodleges kulcsot, 
 # erdemes ellenorizni, hogy tenyleg egyedi-e.
@@ -293,8 +293,8 @@ weather %>%
     count(year, month, day, hour, origin) %>% 
     filter(n > 1)
 
-# Elõfordulhat, hogy egy táblában nincs elsõdleges kulcs!
-# A járatszám / gép sorszáma + dátum elsõdleges kulcs a flights táblában? 
+# ElÅ‘fordulhat, hogy egy tÃ¡blÃ¡ban nincs elsÅ‘dleges kulcs!
+# A jÃ¡ratszÃ¡m / gÃ©p sorszÃ¡ma + dÃ¡tum elsÅ‘dleges kulcs a flights tÃ¡blÃ¡ban? 
 
 flights %>% 
   count(year, month, day, flight) %>% 
@@ -304,8 +304,8 @@ flights %>%
   count(year, month, day, tailnum) %>% 
   filter(n > 1)
 
-# Ilyenkor célszerû létrehozni minden megfigyelésnek egy sorszámot 
-# (mesterséges/helyettesítõ kulcs  = surrogate key)
+# Ilyenkor cÃ©lszerÅ± lÃ©trehozni minden megfigyelÃ©snek egy sorszÃ¡mot 
+# (mestersÃ©ges/helyettesÃ­tÅ‘ kulcs  = surrogate key)
 
 stocks %>% 
   mutate(
@@ -316,7 +316,7 @@ stocks %>%
 # 2.1 Mutating join -------------------------------------------------------
 
 # Egyezteti a megfigyeleseket a kulcsok alapjan, aztan 
-# egyik táblából a másikba masol valtozokat
+# egyik tÃ¡blÃ¡bÃ³l a mÃ¡sikba masol valtozokat
 
 # Hasznaljunk egy keskenyebb tablat, 
 # hogy jol lassuk a kapcsolasok eredmenyet:
@@ -326,21 +326,21 @@ flights2 <- flights %>%
 
 flights2
 
-# Pl. légitársaság teljes nevét (airlines tábla) 
-# adjuk hozzá a flights2 táblához:
+# Pl. lÃ©gitÃ¡rsasÃ¡g teljes nevÃ©t (airlines tÃ¡bla) 
+# adjuk hozzÃ¡ a flights2 tÃ¡blÃ¡hoz:
 
 flights2 %>%
     select(-origin, -dest) %>% 
     left_join(airlines, by = "carrier")
 
-# Ugyanezt megoldhattuk volna a mutate használatával is,
-# igaz, kevésbé átlátható, és több változóval sokkal bonyolultabb lenne
+# Ugyanezt megoldhattuk volna a mutate hasznÃ¡latÃ¡val is,
+# igaz, kevÃ©sbÃ© Ã¡tlÃ¡thatÃ³, Ã©s tÃ¶bb vÃ¡ltozÃ³val sokkal bonyolultabb lenne
 
 flights2 %>%
   select(-origin, -dest) %>% 
   mutate(name = airlines$name[match(carrier, airlines$carrier)])
 
-# A kapcsolások alapjait ezeken az egyszerû táblákon fogjuk szemlélteni:
+# A kapcsolÃ¡sok alapjait ezeken az egyszerÅ± tÃ¡blÃ¡kon fogjuk szemlÃ©lteni:
 
 x <- tribble(
     ~key, ~val_x,
@@ -364,38 +364,38 @@ z <- tribble(
 )
 
 # Inner join
-# Csak a mindkét táblában meglévõ megfigyeléseket tartja meg
+# Csak a mindkÃ©t tÃ¡blÃ¡ban meglÃ©vÅ‘ megfigyelÃ©seket tartja meg
 
 x %>% 
     inner_join(y, by = "key")
 
 # Outer join
-# Akkor tart meg egy megfigyelést, 
-# ha az legalább az egyik táblában elõfordult
+# Akkor tart meg egy megfigyelÃ©st, 
+# ha az legalÃ¡bb az egyik tÃ¡blÃ¡ban elÅ‘fordult
 # http://r4ds.had.co.nz/diagrams/join-outer.png 
 
-# left_join(): az összes bal oldali táblában meglévõ megfigyelést megtartja
+# left_join(): az Ã¶sszes bal oldali tÃ¡blÃ¡ban meglÃ©vÅ‘ megfigyelÃ©st megtartja
 
 x %>% 
     left_join(y,  by = "key") 
 
-# right_join(): a jobb oldali táblából tartja meg az összes megfigyelést
+# right_join(): a jobb oldali tÃ¡blÃ¡bÃ³l tartja meg az Ã¶sszes megfigyelÃ©st
 
 x %>% 
     right_join(y, by = "key") 
 
-# full_join(): mindkét tábla összes megfigyelését megtartja
+# full_join(): mindkÃ©t tÃ¡bla Ã¶sszes megfigyelÃ©sÃ©t megtartja
 
 x %>% 
     full_join(y, by = "key")
 
 # join-ok Venn-diagramon: http://r4ds.had.co.nz/diagrams/join-venn.png 
 
-# Mi történik, ha a kulcsok nem azonosítanak egyértelmûen egy megfigyelést?
+# Mi tÃ¶rtÃ©nik, ha a kulcsok nem azonosÃ­tanak egyÃ©rtelmÅ±en egy megfigyelÃ©st?
 
 # A) Egyik tablaban duplikalt, masikban egyedi
-# pl. ha egy külön táblában tárolunk extra információt
-# egy-kapcsolódik-sokhoz (pl. járatok-repterek)
+# pl. ha egy kÃ¼lÃ¶n tÃ¡blÃ¡ban tÃ¡rolunk extra informÃ¡ciÃ³t
+# egy-kapcsolÃ³dik-sokhoz (pl. jÃ¡ratok-repterek)
 
 x <- tribble(
     ~key, ~val_x,
@@ -413,7 +413,7 @@ y <- tribble(
 left_join(x, y, by = "key")
 
 # B) Mindket tablaban duplan van egy kulcs: 
-# ez altalaban hiba, mert a kulcs egyik táblában sem elsõdleges.
+# ez altalaban hiba, mert a kulcs egyik tÃ¡blÃ¡ban sem elsÅ‘dleges.
 # Ha ezeket egyesitjuk, az osszes lehetseges kombinaciot megkapjuk
 
 x <- tribble(
@@ -448,36 +448,36 @@ flights2 %>%
 
 # C) Nevesitett karaktervektorral pl. c("a" = "b")
 
-# Célállomás koordinátáit kapcsoljuk:
+# CÃ©lÃ¡llomÃ¡s koordinÃ¡tÃ¡it kapcsoljuk:
 
 flights2 %>% 
     left_join(airports, c("dest" = "faa"))
 
-# Kiinduló állomás koordinátáit kapcsoljuk:
+# KiindulÃ³ Ã¡llomÃ¡s koordinÃ¡tÃ¡it kapcsoljuk:
 
 flights2 %>% 
   left_join(airports, c("origin" = "faa"))
 
 
-# 2.1.1 Gyakorlás - mutating join -----------------------------------------
+# 2.1.1 GyakorlÃ¡s - mutating join -----------------------------------------
 
-# 1) Van-e összefüggés egy repülõgép életkora és a késései között?
+# 1) Van-e Ã¶sszefÃ¼ggÃ©s egy repÃ¼lÅ‘gÃ©p Ã©letkora Ã©s a kÃ©sÃ©sei kÃ¶zÃ¶tt?
 
 flights %>%
-  # Mennyit szokott késni egy gép?
+  # Mennyit szokott kÃ©sni egy gÃ©p?
   group_by(tailnum) %>%  
   summarise(
     avg_arr_delay = mean(arr_delay, na.rm = TRUE)
   ) %>% 
-  # Táblák kapcsolása - mi a kulcs?
+  # TÃ¡blÃ¡k kapcsolÃ¡sa - mi a kulcs?
   left_join(planes, key = "tailnum") %>% 
-  # Számoljuk ki, hogy hány éves a gép?
+  # SzÃ¡moljuk ki, hogy hÃ¡ny Ã©ves a gÃ©p?
   mutate(
     plane_age = 2013-year
   ) %>% 
-  # Válasszuk ki csak a fontos változókat!
+  # VÃ¡lasszuk ki csak a fontos vÃ¡ltozÃ³kat!
   select(tailnum, avg_arr_delay, plane_age) %>% 
-  # Készítsünk egy pontfelhõt trendvonallal!
+  # KÃ©szÃ­tsÃ¼nk egy pontfelhÅ‘t trendvonallal!
   ggplot(aes(x = plane_age, y = avg_arr_delay)) + 
   geom_point(alpha = 0.07) + 
   geom_smooth()
@@ -486,38 +486,38 @@ flights %>%
 
 # 2.2 Filtering join ------------------------------------------------------
 
-# A logika hasonló, mint a mutating join-nak,
-# de csak a megfigyelésekre van hatással
+# A logika hasonlÃ³, mint a mutating join-nak,
+# de csak a megfigyelÃ©sekre van hatÃ¡ssal
 
-# semi_join(x, y) - megtart minden megfigyelést x-bõl, aminek van párja y-ban
+# semi_join(x, y) - megtart minden megfigyelÃ©st x-bÅ‘l, aminek van pÃ¡rja y-ban
 
-# anti_join(x, y) - kidob minden megfigyelést x-bõl, aminek van párja y-ban
+# anti_join(x, y) - kidob minden megfigyelÃ©st x-bÅ‘l, aminek van pÃ¡rja y-ban
 
-# Melyik a tíz legfrekventáltabb reptér?
+# Melyik a tÃ­z legfrekventÃ¡ltabb reptÃ©r?
 
 top_dest <- flights %>%
   count(dest, sort = TRUE) %>%
   head(10)
 top_dest
 
-# Melyik járatok mentek ezekre a repterekre?
+# Melyik jÃ¡ratok mentek ezekre a repterekre?
 
-# Használhatnánk egy filtert:
+# HasznÃ¡lhatnÃ¡nk egy filtert:
 
 flights %>% 
   filter(dest %in% top_dest$dest)
 
-# Több változóval nehezebb lenne 
-# (pl. megkeresni a top10 napot napi átlag késés mentén),
-# ezért jobb a semi_join:
+# TÃ¶bb vÃ¡ltozÃ³val nehezebb lenne 
+# (pl. megkeresni a top10 napot napi Ã¡tlag kÃ©sÃ©s mentÃ©n),
+# ezÃ©rt jobb a semi_join:
 
 flights %>% 
   semi_join(top_dest)
 
 # az anti_join pedig hasznos lehet, 
-# ha a kapcsolás során az egyezés hiányát akarjuk megnézni
+# ha a kapcsolÃ¡s sorÃ¡n az egyezÃ©s hiÃ¡nyÃ¡t akarjuk megnÃ©zni
 
-# Melyik járatoknak nincs párja a planes táblában?
+# Melyik jÃ¡ratoknak nincs pÃ¡rja a planes tÃ¡blÃ¡ban?
 
 flights %>%
   anti_join(planes, by = "tailnum") %>%
