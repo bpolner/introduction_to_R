@@ -489,6 +489,8 @@ flights2 %>%
 
 
 
+# 2) Az időjárásnak milyen vonatkozásai függenek össze az indulási késéssel?
+
 
   
 
@@ -530,3 +532,14 @@ flights %>%
 flights %>%
   anti_join(planes, by = "tailnum") %>%
   count(tailnum, sort = TRUE)
+
+
+# 2.2.1 Gyakorlás - filtering join ----------------------------------------
+
+# 1) Szűrd le a flights táblát úgy, hogy csak azok a gépek járatai maradjanak benne,
+# amik legalább 100 utat megtettek!
+
+
+
+# 2) Találd meg az évnek azt a 48 óráját, amikor a legtöbbet késtek a gépek!
+# Kösd össze a weather táblával. Látsz-e mintázatokat?
