@@ -515,6 +515,11 @@ plot_ly(z = ~volcano)
 ```
 
 
+```{r}
+plot_ly(z = ~volcano) %>% add_surface()
+```
+
+
 Texas-i ingatlanpiaci adatok
 ```{r}
 txhousing
