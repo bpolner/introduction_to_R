@@ -175,7 +175,7 @@ Nézzük meg jobban ezeket a megfigyeléseket!
 Gondoljuk végig alaposan: mi okozhatta ezeket az anomáliákat?
 
 
-##Gyakorlás - eloszlások ábrázolása
+###Gyakorlás - eloszlások ábrázolása
 
 1) Vizsgáld meg a price változó eloszlását! Észreveszel-e valami furát?
 
@@ -237,7 +237,7 @@ Miért nem túl informatív ez az ábra?
 ## Változók közös varianciája 
 
 
-Kategorikus vs. folytonos
+###Kategorikus vs. folytonos
 
 ```{r}
 ggplot(data = diamonds, mapping = aes(x = price)) + 
@@ -269,7 +269,7 @@ ggplot(data = diamonds, mapping = aes(x = cut, y = price)) +
 A rosszabb minőségű gyémántok drágábbak lennének?
 
 
-A vágások egyértelműen rangsorolhatóak.
+A csiszolás szempontjából egyértelműen rangsorolhatóak a gyémántok.
 De nem minden kategorikus változó ordinális.
 Vegyük például a különböző típusú autók fogyasztását.
 
@@ -293,6 +293,8 @@ ggplot(data = mpg) +
   coord_flip()
 ```
 
+####Gyakorlás - kovariancia ábrázolása 1.
+
 Hogyan javíthatnánk akkor ezen az ábrán az eddigiek fényében?
 ```{r}
 nycflights13::flights %>% 
@@ -308,7 +310,7 @@ nycflights13::flights %>%
 ```
 
 
-Kategorikus vs. kategorikus
+###Kategorikus vs. kategorikus
 ```{r}
 ggplot(data = diamonds) +
   geom_count(mapping = aes(x = cut, y = color))
@@ -320,7 +322,7 @@ diamonds %>%
   count(color, cut) 
 ```
 
-Ugyanezt megmutathatjuk egy szép hőtérképen is
+Amit megmutathatunk egy szép hőtérképen is
 ```{r}
 diamonds %>% 
   count(color, cut) %>%  
@@ -328,7 +330,17 @@ diamonds %>%
   geom_tile(mapping = aes(fill = n))
 ```
 
-Folytonos vs. folytonos
+####Gyakorlás - kovariancia ábrázolása 2.
+
+
+A dplyr és a geom_tile() felhasználásával nézzük meg, hogyan alakul az átlagos késés
+célállomásonként, havi bontásban. 
+Miért lehet nehézkes ez az ábra? Mit lehetne kezdeni vele?
+
+
+
+
+###Folytonos vs. folytonos
 
 ```{r}
 ggplot(data = diamonds) +
@@ -345,23 +357,36 @@ Nagy adathalmazokon nem mindig segít az áttetszőség szabályzása
 Ilyenkor binekre is oszthatjuk az adatokat
 ```{r}
 ggplot(data = smaller) +
-  geom_bin2d(mapping = aes(x = carat, y = price), bins = 100)
+  geom_bin2d(mapping = aes(x = carat, y = price), bins = 30)
 ```
 
-Készíthetünk boxplotot is:
+Készíthetünk boxplotot is, ha csak az egyik folytonos változót szeleteljük:
 ```{r}
 ggplot(data = smaller, mapping = aes(x = carat, y = price)) + 
   geom_boxplot(mapping = aes(group = cut_width(carat, 0.1)))
 ```
 
+Ebből nem derül ki, hogy melyik dobozban hány gyémánt van, nézzük meg!
+```{r}
+ggplot(data = smaller, mapping = aes(x = carat, y = price)) + 
+  geom_boxplot(mapping = aes(group = cut_width(carat, 0.1)), varwidth = TRUE)
+
+```
+
+
+Vagy daraboljunk körülbelül egyforma elemszámú bin-ekre!
 ```{r}
 ggplot(data = smaller, mapping = aes(x = carat, y = price)) + 
   geom_boxplot(mapping = aes(group = cut_number(carat, 20)))
 ```
 
+####Gyakorlás - kovariancia ábrázolása 3.
+
+Ábrázoljuk az eddigiek segítségével a csiszolás, a karát, és az ár kombinált eloszlását!
 
 
-#Gyors adatfelfedezés
+
+#Összetett felfedező elemzések gyorsan
 
 ##GGally 
 
@@ -434,10 +459,25 @@ mtcars %>%
 
 ```
 
+Akkor igazán hasznos a corrplot, ha sok változó korrelációját szeretnénk egyben áttekinteni
+Például nézzük meg egy 25 kérdésből álló Big Five személyiségteszt tételeinek korrelációit
+
+```{r}
+psych::bfi %>%
+  select(-(gender:age)) %>% 
+  cor(use = "p") %>% 
+  corrplot(method      = "square", 
+           mar         = c(0.2,1,1,0.5))
+```
+
+
+
 [További beállítási lehetőségek a corrplot-ban](https://cran.r-project.org/web/packages/corrplot/vignettes/corrplot-intro.html)
 
 
 # Több panelből álló ábrák 
+
+gridArrange csomag
 
 ```{r, message=FALSE, fig.width=15}
 p1 <- ggplot(diamonds) + 
@@ -461,4 +501,3 @@ grid.arrange(p1, p2, p3,
 ```
 
 [További lehetőségek több panelből álló ábrák szerkesztésére](https://cran.r-project.org/web/packages/egg/vignettes/Ecosystem.html)
-
