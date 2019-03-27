@@ -1,13 +1,13 @@
 ---
 title: "Felfedező adatelemzés"
 output:
-  html_notebook: default
   html_document:
     code_download: true
     df_print: paged
     toc: true
     toc_float:
       toc_collapsed: true
+  html_notebook: default
 ---
 
 [Az R Notebookról bővebben](https://bookdown.org/yihui/rmarkdown/notebook.html)
@@ -15,7 +15,7 @@ output:
 
 ```{r, include=FALSE}
 # ezzel a sorral állíthatnánk be, hogy a kód ne kerüljön bele a knittelt doksiba
-# knitr::opts_chunk$set(echo=FALSE)
+knitr::opts_chunk$set(echo=FALSE)
 ```
 
 Töltsünk be egy pár csomagot!
@@ -147,8 +147,9 @@ Klaszterekbe tömörülő hasonló értékek alcsoportokra utalhatnak.
 Szokatlan értékek (outlier)
 
 Több oka is lehet! 
+
 - adatrögzítési hiba
-- váratlan és informatív megfigyelés
+- ritkán előforduló eset, amit informatív lehet
 
 ```{r}
 ggplot(diamonds) + 
@@ -177,7 +178,7 @@ Gondoljuk végig alaposan: mi okozhatta ezeket az anomáliákat?
 
 ###Gyakorlás - eloszlások ábrázolása
 
-1) Vizsgáld meg a price változó eloszlását! Észreveszel-e valami furát?
+Vizsgáld meg a price változó eloszlását! Észreveszel-e valami furát?
 
 
 
@@ -185,16 +186,16 @@ Gondoljuk végig alaposan: mi okozhatta ezeket az anomáliákat?
 
 Mit tegyünk ezekkel a furcsa gyémántokkal?
 
-A) eldobhatjuk őket
+- eldobhatjuk őket - miért nem szerencsés?
 
 ```{r}
 diamonds2 <- diamonds %>% 
   filter(between(y, 3, 20))
 ```
 
-Miért nem szerencsés?
 
-B) a furcsa értékeiket átírjuk hiányzóra
+
+-  a furcsa értékeiket átírjuk hiányzóra
 
 
 ```{r}
@@ -459,8 +460,9 @@ mtcars %>%
 
 ```
 
-Akkor igazán hasznos a corrplot, ha sok változó korrelációját szeretnénk egyben áttekinteni
-Például nézzük meg egy 25 kérdésből álló Big Five személyiségteszt tételeinek korrelációit
+Akkor igazán hasznos a corrplot, ha sok változó korrelációját szeretnénk egyben áttekinteni.
+
+Például nézzük meg egy 25 kérdésből álló Big Five személyiségteszt tételeinek korrelációit!
 
 ```{r}
 psych::bfi %>%
@@ -492,7 +494,7 @@ p3 <- ggplot(diamonds) +
 grid.arrange(p1, p2, p3, nrow = 1)
 ```
 
-Ábrák elrendezésének finomhangolása
+Ábrák elrendezésének finomhangolása a layout_matrix argumentummal
 ```{r, fig.width=15}
 grid.arrange(p1, p2, p3, 
              layout_matrix = rbind(c(1, 2, 2),
@@ -501,3 +503,78 @@ grid.arrange(p1, p2, p3,
 ```
 
 [További lehetőségek több panelből álló ábrák szerkesztésére](https://cran.r-project.org/web/packages/egg/vignettes/Ecosystem.html)
+
+
+#Interaktív ábrák a plotly-vel
+
+[Bevezetés a plotly használatába](https://plotly-book.cpsievert.me/)
+
+Nézzünk meg elsőnek egy vulkánt!
+```{r}
+plot_ly(z = ~volcano)
+```
+
+
+Texas-i ingatlanpiaci adatok
+```{r}
+txhousing
+```
+
+
+
+Két út a plotly objektumok létrehozására:
+
+1) ggplotly(): egy ggplot objektum átalákítása
+2) plot_ly(): közvetlenül az adatok megadása
+
+
+##ggplotly(): egy ggplot objektum átalákítása
+
+Készítsünk egy ggplot2 ábrát, ahol az idő függvényében mutatjuk a városonkénti medián eladási árat!
+```{r}
+(p <- ggplot(txhousing, aes(date, median)) +
+  geom_line(aes(group = city), alpha = 0.2))
+```
+A tooltip alapból minden információt mutat, amit az esztétikai kapcsolásnál (aes) megadtunk
+```{r}
+ggplotly(p)
+```
+
+Felül is írhatjuk, hogy mit kapjon meg a tooltip  
+```{r}
+ggplotly(p, tooltip = "city")
+```
+
+##plot_ly(): közvetlenül az adatok megadása
+
+Adatok manipulálásra a dplyr és a tidyr függvényeit használhatjuk
+Pl. a csoportosított adatokat "érti" a plotly 
+(csoportosítás minden egyes szintjére lesz legalább egy grafikai elem)
+
+```{r}
+tx <- group_by(txhousing, city)
+```
+
+Létrehozunk egy plotly objektumot
+```{r}
+p <- plot_ly(tx, x = ~date, y = ~median)
+```
+
+plotly_data() visszaadja egy plotly objektumhoz tartozó adatokat
+```{r}
+plotly_data(p) 
+```
+```{r}
+# városonként felrakunk egy-egy vonalat az ábrára (város csoportosító változó)
+p %>% 
+  add_lines(alpha = 0.2, name = "Texan Cities", hoverinfo = "none") %>% 
+  # Houston kap egy külön vonalat
+  add_lines(name = "Houston", data = filter(txhousing, city == "Houston"))
+```
+A plotly csomagban van egy rakás add_*() függvény
+
+Ezek öröklik a plot_ly() híváskor meghatározott attribútumokat (pl. melyik tengelyen mi legyen)
+
+És öröklik a plotly objektumhoz tartozó adatokat, amit felülírhatunk a data argumentumnál
+
+Gondolhatunk úgy is ezekre a függvényekre mint a ggplot2 rétegeinek egy változatára 
