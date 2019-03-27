@@ -1,18 +1,21 @@
 ---
 title: "Felfedező adatelemzés"
 output:
+  html_notebook: default
   html_document:
     code_download: true
     df_print: paged
     toc: true
     toc_float:
       toc_collapsed: true
-  html_notebook: default
 ---
 
+[Az R Notebookról bővebben](https://bookdown.org/yihui/rmarkdown/notebook.html)
+
+
 ```{r, include=FALSE}
-# ezzel a sorral állítjuk be, hogy a kód ne kerüljön bele a knittelt doksiba
-knitr::opts_chunk$set(echo=FALSE)
+# ezzel a sorral állíthatnánk be, hogy a kód ne kerüljön bele a knittelt doksiba
+# knitr::opts_chunk$set(echo=FALSE)
 ```
 
 Töltsünk be egy pár csomagot!
@@ -458,136 +461,4 @@ grid.arrange(p1, p2, p3,
 ```
 
 [További lehetőségek több panelből álló ábrák szerkesztésére](https://cran.r-project.org/web/packages/egg/vignettes/Ecosystem.html)
-
-# Interaktív ábrák: plotly ------------------------------------------------
-
-# https://plotly-book.cpsievert.me/ 
-
-
-
-plot_ly(z = ~volcano)
-
-p <- ggplot(txhousing, aes(date, median)) +
-  geom_line(aes(group = city), alpha = 0.2)
-
-# Két út a plotly objektumok létrehozására:
-# 1) ggplotly(): egy ggplot objektum átalákítása
-
-subplot(
-  p, 
-  ggplotly(p, tooltip = "city"), 
-  ggplot(txhousing, aes(date, median)) + geom_bin2d(),
-  ggplot(txhousing, aes(date, median)) + geom_hex(),
-  
-  nrows = 2, shareX = TRUE, shareY = TRUE,
-  titleY = FALSE, titleX = FALSE
-)
-
-# 2) plot_ly(): közvetlenül az adatok megadása
-
-# Adatok manipulálásra a dplyr függvényeit használhatjuk
-library(dplyr)
-
-# Pl. a csoportosított adatokat "érti" a plotly
-tx <- group_by(txhousing, city)
-
-# létrehozunk egy plotly objektumot
-p <- plot_ly(tx, x = ~date, y = ~median)
-
-# plotly_data() visszaadja egy plotly objektumhoz tartozó adatokat
-plotly_data(p)
-
-
-# Similar to geom_line() in ggplot2, the add_lines() function connects 
-# (a group of) x/y pairs with lines in the order of their x values, 
-# which is useful when plotting time series as shown in Figure 1.2.
-
-# add a line highlighting houston
-add_lines(
-  # plots one line per city since p knows city is a grouping variable
-  add_lines(p, alpha = 0.2, name = "Texan Cities", hoverinfo = "none"),
-  name = "Houston", data = filter(txhousing, city == "Houston")
-)
-
-# Minden plotly függvény módosít egy plotly objektumot 
-# (vagy a mögöttes adatokat), így a többrétegű ábrákat
-# adatmódosítások és vizuális kapcsolások sorozataként is leírhatjuk,
-# a %>% operátor használatával. 
-# Tehát az előző ábra egyszerűbben:
-
-allCities <- txhousing %>%
-  group_by(city) %>%
-  plot_ly(x = ~date, y = ~median) %>%
-  add_lines(alpha = 0.2, name = "Texan Cities", hoverinfo = "none")
-
-
-
-allCities %>%
-  filter(city == "Houston") %>%
-  add_lines(name = "Houston")
-
-# Így viszont a pipeline végén már nem lehet az eredeti adatokat 
-# visszanyerni, csak a Houstonra szűrt adatokat. 
-
-plotly_data(allCities)
-
-plotly_data(
-  allCities %>%
-    filter(city == "Houston") %>%
-    add_lines(name = "Houston")
-)
-
-# Az add_fun függvénnyel kezelhető ez a probléma: 
-# csak a plotly objektumot módosítja, az adatokat nem érinti
-
-# Pl. egy pipelineban két várost is kiemelhetünk az ábrán:
-
-allCities %>%
-  add_fun(function(plot) {
-    plot %>% filter(city == "Houston") %>% add_lines(name = "Houston")
-  }) %>%
-  add_fun(function(plot) {
-    plot %>% filter(city == "San Antonio") %>% 
-      add_lines(name = "San Antonio")
-  })
-
-
-# Az add_fun függvénynek további argumentumokat is megadhatunk,
-# - az add_fun-nal valójában rétegeket adhatunk az ábrához!
-
-# Create a reusable function for layering 
-# both a particular city as well as the 
-# first, second, and third quartile of median
-# monthly house sales (by city).
-
-# Írjunk egy függvényt, amivel ki tudunk emelni egy adott várost,
-# és az 1., 2. és 3. kvartilisét a havi ingatlanértékesítések mediánjának!
-
-#  fgv egy adott város kiemelésére
-layer_city <- function(plot, name) {
-  plot %>% filter(city == name) %>% add_lines(name = name)
-}
-
-# fgv a medián és az IQR megjelenítésére
-layer_iqr <- function(plot) {
-  plot %>%
-    group_by(date) %>% 
-    summarise(
-      q1 = quantile(median, 0.25, na.rm = TRUE),
-      m = median(median, na.rm = TRUE),
-      q3 = quantile(median, 0.75, na.rm = TRUE)
-    ) %>%
-    add_lines(y = ~m, name = "median", color = I("black")) %>%
-    add_ribbons(ymin = ~q1, ymax = ~q3, name = "IQR", color = I("black"))
-}
-
-allCities %>%
-  add_fun(layer_iqr) %>%
-  add_fun(layer_city, "Houston") %>%
-  add_fun(layer_city, "San Antonio")
-
-# A rétegképző függvényeknek nem muszáj pipeline-okat tartalmazniuk
-# Egy szabály van: bemenetük és kimenetük is egy plot objektum legyen
-
-
 
