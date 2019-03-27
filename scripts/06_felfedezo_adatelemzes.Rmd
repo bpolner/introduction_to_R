@@ -1,0 +1,593 @@
+---
+title: "Felfedező adatelemzés"
+output:
+  html_document:
+    code_download: true
+    df_print: paged
+    toc: true
+    toc_float:
+      toc_collapsed: true
+  html_notebook: default
+---
+
+```{r, include=FALSE}
+# ezzel a sorral állítjuk be, hogy a kód ne kerüljön bele a knittelt doksiba
+knitr::opts_chunk$set(echo=FALSE)
+```
+
+Töltsünk be egy pár csomagot!
+```{r, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(plotly)
+library(htmlwidgets)
+library(GGally)
+library(gridExtra)
+library(corrplot)
+library(plotly)
+library(htmlwidgets)
+```
+
+
+#Miről szól a felfedező adatelemzés?
+
+Az a cél, hogy elkezdjük érteni az adatokat.
+
+Kreatív folyamat, hagyatkozzunk a megérzéseinkre (is),   
+
+1. Találj ki kérdéseket az adatokkal kapcsolatban!
+2. Próbáld megválaszolni őket ábrázolások, transzformációk, és modellek által!
+3. Ezek fényében finomítsd a kérdéseket, és tegyél fel újakat!
+
+Érdemes jó sok kérdéssel indítani, aztán majd elválik, 
+hogy melyikkel mennyit érdemes foglalkozni
+
+Nincsenek szigorúan értelmezett szabályok, két kérdés viszont általában érdekes: 
+
+- milyen a változók variabilitása?
+- milyen a változók közös varianciája?
+
+##Változók variabilitásának vizsgálata 
+ 
+Eloszlások megjelenítése
+ 
+
+Kategorikus változók: oszlopdiagram
+```{r}
+ggplot(data = diamonds) +
+  geom_bar(mapping = aes(x = cut))
+```
+
+Oszlopok magassága *x* lehetséges értékeinek darabszámát mutatja
+```{r}
+diamonds %>% 
+  count(cut)
+```
+
+
+Folytonos változók eloszlását pedig megnézhetjük mondjuk egy hisztogramon
+```{r}
+ggplot(data = diamonds) +
+  geom_histogram(mapping = aes(x = carat), binwidth = 0.5)
+```
+
+
+A megjelenített értékek kiszámolása
+
+```{r}
+diamonds %>% 
+  count(cut_width(carat, 0.5))
+```
+
+geom_histogram binwidth argumentuma mondja meg, 
+hogy az x változót mekkora intervallumokra szabdaljuk fel
+az ábrázoláshoz - érdemes kipróbálni több értéket!
+Pl. csak a három karátnál kisebb gyémántok, keskenyebb binekkel:
+
+```{r}
+smaller <- diamonds %>% 
+  filter(carat < 3)
+
+ggplot(data = smaller, mapping = aes(x = carat)) +
+  geom_histogram(binwidth = 0.1) 
+
+```
+
+
+Ugyanez szétdobva csiszolás szerint fazettákra
+```{r, fig.height=6}
+ggplot(data = smaller, mapping = aes(x = carat)) +
+  geom_histogram(binwidth = 0.1) + 
+  facet_wrap(~ cut, nrow = 5)
+```
+
+
+
+Ha több kategória eloszlását egy ábrán akarjuk mutatni, rajzoljunk inkább vonalakat!
+```{r}
+ggplot(data = smaller, mapping = aes(x = carat, colour = cut)) +
+  geom_freqpoly(binwidth = 0.1, size = 2)
+```
+
+
+Mire érdemes figyelni?
+
+- Mik a leggyakoribb értékek? Miért? 
+- Mik a legritkább értékek? Miért? Erre számítottunk?
+- Szokatlan, különös mintázatok? Mi lehet az oka?
+
+
+Mi az érdekes ezen az ábrán?
+```{r}
+ggplot(data = smaller, mapping = aes(x = carat)) +
+  geom_histogram(binwidth = 0.01)
+```
+
+
+
+És ezen?
+```{r}
+ggplot(data = faithful, mapping = aes(x = eruptions)) + 
+  geom_histogram(binwidth = 0.25) + 
+  xlab("Kitörés hossza (perc)") +
+  ylab("Gyakoriság") + 
+  ggtitle("Az Old Faithful gejzír kitörései")
+```
+
+Klaszterekbe tömörülő hasonló értékek alcsoportokra utalhatnak.
+
+- Milyen szempontból hasonlóak egymáshoz az egy csoportba tartozó megfigyelések?
+- Milyen szempontból különböznek egymástól a külön csoportokba tartozó megfigyelések? 
+- Hogyan lehetne jellemezni a klasztereket?
+- Miért lehet félrevezető a klaszterek jelenléte? 
+
+
+Szokatlan értékek (outlier)
+
+Több oka is lehet! 
+- adatrögzítési hiba
+- váratlan és informatív megfigyelés
+
+```{r}
+ggplot(diamonds) + 
+  geom_histogram(mapping = aes(x = y), binwidth = 0.5)
+```
+
+Hol van itt az outlier? Közelítsünk rá az ábrára!
+
+```{r}
+ggplot(diamonds) + 
+  geom_histogram(mapping = aes(x = y), binwidth = 0.5) +
+  coord_cartesian(ylim = c(0, 50))
+```
+
+
+Nézzük meg jobban ezeket a megfigyeléseket!
+```{r}
+(unusual <- diamonds %>% 
+  filter(y < 3 | y > 20) %>% 
+  select(price, x, y, z) %>%
+  arrange(y))
+```
+
+Gondoljuk végig alaposan: mi okozhatta ezeket az anomáliákat?
+
+
+##Gyakorlás - eloszlások ábrázolása
+
+1) Vizsgáld meg a price változó eloszlását! Észreveszel-e valami furát?
+
+
+
+##Hiányzó értékek 
+
+Mit tegyünk ezekkel a furcsa gyémántokkal?
+
+A) eldobhatjuk őket
+
+```{r}
+diamonds2 <- diamonds %>% 
+  filter(between(y, 3, 20))
+```
+
+Miért nem szerencsés?
+
+B) a furcsa értékeiket átírjuk hiányzóra
+
+
+```{r}
+diamonds2 <- diamonds %>% 
+  mutate(y = ifelse(y < 3 | y > 20, NA, y))
+```
+
+
+
+```{r}
+ggplot(data = diamonds2, mapping = aes(x = x, y = y)) + 
+  geom_point()
+```
+
+
+
+ggplot2 figyelmeztet az NA-kra
+
+De az is lehet, hogy pont a hiányzó értékeket tartalmazó megfigyelések érdekesek 
+Pl. mikor kellett volna indulniuk a törölt járatoknak? 
+
+
+```{r}
+nycflights13::flights %>% 
+  mutate(
+    cancelled = is.na(dep_time),
+    sched_hour = sched_dep_time %/% 100,
+    sched_min = sched_dep_time %% 100,
+    sched_dep_time = sched_hour + sched_min / 60
+  ) %>% 
+  ggplot(mapping = aes(sched_dep_time)) + 
+  geom_freqpoly(mapping = aes(colour = cancelled), binwidth = 1/4)
+
+```
+
+
+Miért nem túl informatív ez az ábra? 
+
+
+## Változók közös varianciája 
+
+
+Kategorikus vs. folytonos
+
+```{r}
+ggplot(data = diamonds, mapping = aes(x = price)) + 
+  geom_freqpoly(mapping = aes(colour = cut), binwidth = 500)
+```
+
+A gyakoriságokban nagy eltérések vannak, ezért nem látszik jól, hogy különbözik-e
+a különböző csiszolású gyémántok eloszlása
+
+```{r}
+ggplot(diamonds) + 
+  geom_bar(mapping = aes(x = cut))
+```
+
+
+Ilyenkor darabszám helyett érdemes a sűrűséget mutatni:
+```{r}
+ggplot(data = diamonds, mapping = aes(x = price, y = ..density..)) + 
+  geom_freqpoly(mapping = aes(colour = cut), binwidth = 500)
+```
+
+
+Vagy használhatunk boxplotot is
+```{r}
+ggplot(data = diamonds, mapping = aes(x = cut, y = price)) +
+  geom_boxplot()
+```
+
+A rosszabb minőségű gyémántok drágábbak lennének?
+
+
+A vágások egyértelműen rangsorolhatóak.
+De nem minden kategorikus változó ordinális.
+Vegyük például a különböző típusú autók fogyasztását.
+
+```{r}
+ggplot(data = mpg, mapping = aes(x = class, y = hwy)) +
+  geom_boxplot()
+```
+
+Az ábra áttekinthetőbb lehet, ha a 
+fogyasztás mediánja szerint sorbarendezzük a kategóriákat
+
+```{r}
+ggplot(data = mpg) +
+  geom_boxplot(mapping = aes(x = reorder(class, hwy, FUN = median), y = hwy))
+```
+
+Ha hosszúak a változónevek, forgassunk egyet az ábrán:
+```{r}
+ggplot(data = mpg) +
+  geom_boxplot(mapping = aes(x = reorder(class, hwy, FUN = median), y = hwy)) +
+  coord_flip()
+```
+
+Hogyan javíthatnánk akkor ezen az ábrán az eddigiek fényében?
+```{r}
+nycflights13::flights %>% 
+  mutate(
+    cancelled = is.na(dep_time),
+    sched_hour = sched_dep_time %/% 100,
+    sched_min = sched_dep_time %% 100,
+    sched_dep_time = sched_hour + sched_min / 60
+  ) %>% 
+  ggplot(mapping = aes(sched_dep_time)) + 
+  geom_freqpoly(mapping = aes(colour = cancelled), binwidth = 1/4)
+
+```
+
+
+Kategorikus vs. kategorikus
+```{r}
+ggplot(data = diamonds) +
+  geom_count(mapping = aes(x = cut, y = color))
+```
+
+Az ábrához tartozó gyakorisági tábla
+```{r}
+diamonds %>% 
+  count(color, cut) 
+```
+
+Ugyanezt megmutathatjuk egy szép hőtérképen is
+```{r}
+diamonds %>% 
+  count(color, cut) %>%  
+  ggplot(mapping = aes(x = color, y = cut)) +
+  geom_tile(mapping = aes(fill = n))
+```
+
+Folytonos vs. folytonos
+
+```{r}
+ggplot(data = diamonds) +
+  geom_point(mapping = aes(x = carat, y = price))
+```
+
+Hátha többet látunk, ha áttetszővé tesszük a pontokat
+```{r}
+ggplot(data = diamonds) + 
+  geom_point(mapping = aes(x = carat, y = price), alpha = 1 / 100)
+```
+
+Nagy adathalmazokon nem mindig segít az áttetszőség szabályzása
+Ilyenkor binekre is oszthatjuk az adatokat
+```{r}
+ggplot(data = smaller) +
+  geom_bin2d(mapping = aes(x = carat, y = price), bins = 100)
+```
+
+Készíthetünk boxplotot is:
+```{r}
+ggplot(data = smaller, mapping = aes(x = carat, y = price)) + 
+  geom_boxplot(mapping = aes(group = cut_width(carat, 0.1)))
+```
+
+```{r}
+ggplot(data = smaller, mapping = aes(x = carat, y = price)) + 
+  geom_boxplot(mapping = aes(group = cut_number(carat, 20)))
+```
+
+
+
+#Gyors adatfelfedezés
+
+##GGally 
+
+Változók eloszlása és kapcsolata egy nagy ábrán, egyetlen sor kóddal
+```{r, fig.width=10, fig.height=10, message=FALSE}
+ggpairs(iris, progress=FALSE)
+```
+
+Érdemes tudni a base graphics pairs() függvényéről is: kevésbé látványos, viszont jóval gyorsabb
+```{r, fig.height=7,  fig.width=7}
+pairs(iris, pch=16)
+```
+
+[Egyéb pontfelhő-mátrix lehetőségek](http://www.sthda.com/english/wiki/scatter-plot-matrices-r-base-graphs#r-base-scatter-plot-matrices-pairs)
+
+Hasznos lehet még a ggcoef() egy modell együtthatóinak gyors áttekintéséhez
+
+Nézzünk egy példát!
+
+Mivel függ össze a fogyasztás? 
+```{r}
+mtcars %>% 
+  select(mpg, disp, hp, wt) %>% 
+  pairs()
+```
+
+Illesszünk többszörös lineáris regresziós modellt, és nézzük meg az eredményeket!
+```{r}
+model <- 
+  mtcars %>% 
+  select(mpg, disp, hp, wt) %>% 
+  # standardizáljuk a változókat, hogy standardizált együtthatókat kapjunk
+  mutate_all(scale) %>%
+  lm(mpg ~  ., data = .)
+
+summary(model)
+confint(model)
+```
+
+Mindezt ábrázolhatjuk is
+```{r}
+ggcoef(model)
+```
+
+##corrplot
+
+
+Korrelációs mátrixok ábrázolása
+```{r}
+mtcars %>% 
+  select(mpg, disp, hp, wt) %>% 
+  cor() %>% # korrelációs mátrix
+  corrplot()
+```
+
+```{r}
+p_mat <- 
+  mtcars %>% 
+  select(mpg, disp, hp, wt, qsec) %>% 
+  cor.mtest() %>% .[["p"]] # kinyerjük a korrelációkhoz tartozó 
+
+mtcars %>% 
+  select(mpg, disp, hp, wt, qsec) %>% 
+  cor() %>% # korrelációs mátrix
+  corrplot(p.mat       = p_mat, 
+           method      = "square", 
+           addCoef.col = "lightgrey", 
+           mar         = c(0.2,1,1,0.5), 
+           insig       = "blank")
+
+```
+
+[További beállítási lehetőségek a corrplot-ban](https://cran.r-project.org/web/packages/corrplot/vignettes/corrplot-intro.html)
+
+
+# Több panelből álló ábrák 
+
+```{r, message=FALSE, fig.width=15}
+p1 <- ggplot(diamonds) + 
+  geom_freqpoly(aes(price), col="blue",binwidth = 1000)
+
+p2 <- ggplot(diamonds) + 
+  geom_point(aes(carat, price), alpha = 0.01, col="blue")
+
+p3 <- ggplot(diamonds) + 
+  geom_histogram(aes(price), fill="blue", binwidth = 10)
+
+grid.arrange(p1, p2, p3, nrow = 1)
+```
+
+Ábrák elrendezésének finomhangolása
+```{r, fig.width=15}
+grid.arrange(p1, p2, p3, 
+             layout_matrix = rbind(c(1, 2, 2),
+                                   c(3, 2, 2))
+             )
+```
+
+[További lehetőségek több panelből álló ábrák szerkesztésére](https://cran.r-project.org/web/packages/egg/vignettes/Ecosystem.html)
+
+# Interaktív ábrák: plotly ------------------------------------------------
+
+# https://plotly-book.cpsievert.me/ 
+
+
+
+plot_ly(z = ~volcano)
+
+p <- ggplot(txhousing, aes(date, median)) +
+  geom_line(aes(group = city), alpha = 0.2)
+
+# Két út a plotly objektumok létrehozására:
+# 1) ggplotly(): egy ggplot objektum átalákítása
+
+subplot(
+  p, 
+  ggplotly(p, tooltip = "city"), 
+  ggplot(txhousing, aes(date, median)) + geom_bin2d(),
+  ggplot(txhousing, aes(date, median)) + geom_hex(),
+  
+  nrows = 2, shareX = TRUE, shareY = TRUE,
+  titleY = FALSE, titleX = FALSE
+)
+
+# 2) plot_ly(): közvetlenül az adatok megadása
+
+# Adatok manipulálásra a dplyr függvényeit használhatjuk
+library(dplyr)
+
+# Pl. a csoportosított adatokat "érti" a plotly
+tx <- group_by(txhousing, city)
+
+# létrehozunk egy plotly objektumot
+p <- plot_ly(tx, x = ~date, y = ~median)
+
+# plotly_data() visszaadja egy plotly objektumhoz tartozó adatokat
+plotly_data(p)
+
+
+# Similar to geom_line() in ggplot2, the add_lines() function connects 
+# (a group of) x/y pairs with lines in the order of their x values, 
+# which is useful when plotting time series as shown in Figure 1.2.
+
+# add a line highlighting houston
+add_lines(
+  # plots one line per city since p knows city is a grouping variable
+  add_lines(p, alpha = 0.2, name = "Texan Cities", hoverinfo = "none"),
+  name = "Houston", data = filter(txhousing, city == "Houston")
+)
+
+# Minden plotly függvény módosít egy plotly objektumot 
+# (vagy a mögöttes adatokat), így a többrétegű ábrákat
+# adatmódosítások és vizuális kapcsolások sorozataként is leírhatjuk,
+# a %>% operátor használatával. 
+# Tehát az előző ábra egyszerűbben:
+
+allCities <- txhousing %>%
+  group_by(city) %>%
+  plot_ly(x = ~date, y = ~median) %>%
+  add_lines(alpha = 0.2, name = "Texan Cities", hoverinfo = "none")
+
+
+
+allCities %>%
+  filter(city == "Houston") %>%
+  add_lines(name = "Houston")
+
+# Így viszont a pipeline végén már nem lehet az eredeti adatokat 
+# visszanyerni, csak a Houstonra szűrt adatokat. 
+
+plotly_data(allCities)
+
+plotly_data(
+  allCities %>%
+    filter(city == "Houston") %>%
+    add_lines(name = "Houston")
+)
+
+# Az add_fun függvénnyel kezelhető ez a probléma: 
+# csak a plotly objektumot módosítja, az adatokat nem érinti
+
+# Pl. egy pipelineban két várost is kiemelhetünk az ábrán:
+
+allCities %>%
+  add_fun(function(plot) {
+    plot %>% filter(city == "Houston") %>% add_lines(name = "Houston")
+  }) %>%
+  add_fun(function(plot) {
+    plot %>% filter(city == "San Antonio") %>% 
+      add_lines(name = "San Antonio")
+  })
+
+
+# Az add_fun függvénynek további argumentumokat is megadhatunk,
+# - az add_fun-nal valójában rétegeket adhatunk az ábrához!
+
+# Create a reusable function for layering 
+# both a particular city as well as the 
+# first, second, and third quartile of median
+# monthly house sales (by city).
+
+# Írjunk egy függvényt, amivel ki tudunk emelni egy adott várost,
+# és az 1., 2. és 3. kvartilisét a havi ingatlanértékesítések mediánjának!
+
+#  fgv egy adott város kiemelésére
+layer_city <- function(plot, name) {
+  plot %>% filter(city == name) %>% add_lines(name = name)
+}
+
+# fgv a medián és az IQR megjelenítésére
+layer_iqr <- function(plot) {
+  plot %>%
+    group_by(date) %>% 
+    summarise(
+      q1 = quantile(median, 0.25, na.rm = TRUE),
+      m = median(median, na.rm = TRUE),
+      q3 = quantile(median, 0.75, na.rm = TRUE)
+    ) %>%
+    add_lines(y = ~m, name = "median", color = I("black")) %>%
+    add_ribbons(ymin = ~q1, ymax = ~q3, name = "IQR", color = I("black"))
+}
+
+allCities %>%
+  add_fun(layer_iqr) %>%
+  add_fun(layer_city, "Houston") %>%
+  add_fun(layer_city, "San Antonio")
+
+# A rétegképző függvényeknek nem muszáj pipeline-okat tartalmazniuk
+# Egy szabály van: bemenetük és kimenetük is egy plot objektum legyen
+
+
+
