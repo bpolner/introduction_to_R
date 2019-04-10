@@ -42,7 +42,7 @@ rm(list=c("v1", "v2"))
 
 # Elemi vektorok létrehozása: c()
 
-szamok  <- c(4, 5, 10, 99)
+szamok  <- c(4L, 5L, 10L, 99L)
 allatok <- c("kutya", "macska")
 
 # Az elemi vektor mindig lapos, akkor is, ha beágyazva hozzuk létre
@@ -60,6 +60,7 @@ typeof(allatok)
 
 # Bizonyos típusú-e egy vektor? Általánosságban: is.valami()
 is.double(allatok)
+is.character(allatok)
 
 # numeric: double és integer
 is.numeric(1L)
@@ -89,6 +90,7 @@ x <- c(10.4, 5.6, 3.1, 6.4, 21.7)
 1/x
 min(x)
 max(x)
+sort(x)
 sort(x, decreasing = TRUE)
 order(x)
 rank(x)
@@ -178,7 +180,7 @@ typeof(NA_integer_)
 typeof(NA_real_)
 
 # Altalanossagban: minden NA-n vegzett muvelet NA-t ad eredmenyul.
-mean(b, na.rm = TRUE)
+mean(b)
 b > 5
 is.na(b)
 
@@ -226,26 +228,32 @@ x[x < 5] <- 999
 
 # 1. Hozzunk letre egy otelemu vektort, ami tizzel kezdodik, es harmasaval novekedik! 
 #    Taroljuk a vektort az x valtozoban.
-
+x <- seq(from = 10, by = 3, length.out = 5)
 
 # 2. Emeljuk negyzetre az elobb letrehozott x vektort, es rendezzuk csokkeno sorrendbe!
 #    Taroluk ezt a vektort az y valtozoban. 
-
+y <- sort(x**2, decreasing = TRUE)
 
 # 3. Valogassuk ki z vektorbol a 10-nel nagyobb elemeket, es taroljuk a z2 vektorban.
 z <- c(3, .2, NA, 50, 4000, 10, 11)
 
+z[z > 10]
 
 # 4. A hianyzo adatok helyere tegyunk 0-t. Majd szamoljuk ki a vektor atlagat, minimum es 
 #    maximum erteket, es taroljuk ezeket a descr vektorban!
 numbers <- c(-4, 3.2, NA, NA, 100, 146, 98)
 
+numbers[is.na(numbers)] <- 0
+
+c(mean(numbers), min(numbers), max(numbers))
+
+replace(numbers, is.na(numbers), 0)
 
 ## Lista  ----------------
 
 # Olyan vektor, amiben tobbfele adattipus is lehet.
 
-uj_lista <- list(a = 2.5, b = "kutya", c = 1:100)
+uj_lista <- list(a = 2.5, b = "kutya", c = 1:10)
 
 uj_lista
 
@@ -299,6 +307,10 @@ x <-
     masodik = list(egy_szam = 1, egy_sorozat = 4:7, beagyazott_lista = list(c(2, 1, 83),"nyerjük ki ezt a stringet") )
   )
 
+str(x)
+
+x[[2]][[3]][[2]]
+
 # Attribútumok ----
 
 # Minden objektumnak lehetnek attribútumai: itt lehetnek metaadatok
@@ -331,7 +343,7 @@ attributes(sum(y))
 # Egy vektornak 3 módon adhatunk neveket:
 
 # Amikor létrehozzuk
-x <- c(a = 1, b = 2, c = 3).
+x <- c(a = 1, b = 2, c = 3)
 
 # Módosítjuk egy meglévő vektor names attr-át:
 x <- 1:3
@@ -384,15 +396,22 @@ table(sex_char)
 
 table(sex_factor)
 
+# as.factor megtartja az eredeti szinteket, ha egy faktorra hívjuk meg
+# factor elveszti az eredeti szinteket
+factor(sex_factor)
+as.factor(sex_factor)
+
 
 # Bár a faktor string-nek tűnik, valójában integer!
-sex_factor <- factor(c("m", "m", "f"), levels = c("m", "f"))
+sex_factor <- factor(c("m", "m", "f"), levels = c("m", "f"), labels = c("male", "female"))
 typeof(sex_factor)
 
 # Ha a címkéken akarunk műveletet végezni, az a biztos, ha explicit módon karakterré alakítjuk
 as.character(sex_factor)
 
-
+f <- factor(c(0,1,0,1,1))
+f
+as.numeric(f)
 
 ## Matrix ----------------
 
@@ -407,7 +426,7 @@ dim(mat) <- c(4,5)
 
 mat <- matrix(1:12, nrow = 3, ncol = 4)
 mat
-mat[3,2:4]
+mat[ ,1 ]
 dim(mat)
 
 length(mat)
@@ -455,6 +474,9 @@ adatok[adatok$age < 40, ]
 adatok[ , c("patient", "test_score")]
 adatok[ , c("test_score", "patient")]
 
+# Sornévvel
+mtcars["Volvo 142E", ]
+
 # A karaktervektort egy változóban is tárolhatjuk, és ezt a változót is használhatjuk az indexeléshez
 valtozok <- c("age", "test_score")
 adatok[, valtozok]
@@ -472,7 +494,6 @@ colnames(adatok2) <- c("kor", "beteg", "teszt")
 
 # Indexelt oszlopnevekhez új érték rendelésével átnevezhetjük a változókat 
 colnames(adatok2)[2] <- "csoport"
-
 
 
 ## Kodolasi stilus tanacsok ----------------
