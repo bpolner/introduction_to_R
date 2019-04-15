@@ -548,22 +548,21 @@ tail(stroop_files)
 grepl('.csv','az_en_kis_mappam/proba_log.csv')
 grepl('.csv','az_en_kis_mappam/osszes_log.zip')
 
-df_list <- c()
+fulldf <- c()
 for (fname in stroop_files){
   if (grepl('.csv',fname)){
     fullpath <- paste0(stroop_dir,fname)
-    df_list <- append(df_list, read.csv(fullpath, header=T))
+    fulldf <- rbind(fulldf,read.csv(fullpath, header=T))
   }
 }
 
-i <- 1
-for (df in df_list){
-  if (i == 1){
-    stroop_df <- df
-  }else{
-    stroop_df <- rbind(stroop_df,df)
-  }
-  i = i + 1
+
+# DE a dir() függvény teli van hasznosabbnál hasznosabb argumentumokkal!
+?dir
+
+fulldf <- c()
+for (fname in dir(path = stroop_dir, pattern = '*.csv', full.names = T)){
+  fulldf <- rbind(fulldf,read.csv(fname, header=T))
 }
 
-df_list
+str(fulldf)
