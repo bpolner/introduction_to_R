@@ -55,10 +55,25 @@ if (x > 100) {
 #     }
 
 adj_hozza_egyet <- function(x) {
-  x + 1
+  return(x + 1)
 }
 
-adj_hozza_egyet(3)
+x1 <- adj_hozza_egyet(3)
+x1
+
+szam <- 50
+
+check_100 <- function(szam){
+  if (szam > 100) {
+    return("Juhu, a szam nagyobb szaznal.")
+  } else if (szam == 100) {
+    return("Hoho, a szam pont 100!")
+  } else {
+    return("Sajnos a szam kisebb 100-nal")
+  }
+}
+
+check_100(200)
 
 check_100 <- function(szam) {
     if (szam > 100) {
@@ -136,7 +151,7 @@ print(szoveg)
 x <- c(1,2)
 
 append_x <- function(number) {
-    x <- append(x,number)
+    x <<- append(x,number)
 }
 
 append_x(3)
@@ -160,6 +175,19 @@ x
 # Írjunk olyan függvényt, ami az adott számra megmondja nekünk,
 # hogy az pozitív, negatív, vagy 0!
 
+pozneg0 <- function(szam){
+  if(szam>0){
+    return('poz')
+    } else if (szam==0) {
+    return('nulla')}
+  else{
+    return('negativ')
+    }
+}
+
+pozneg0(-2)
+pozneg0(0)
+pozneg0(10)
 
 # Írjunk a Fibonacci sorozatra függvényt, ami tetszőleges szám beadására
 # kiadja az annak megfelelő hosszúságú Fibonacci-sort, pl.:
@@ -167,8 +195,41 @@ x
 #     fib(8)
 #     Output: [1] 0,1,1,2,3,5,8,13
 
+fib <- c(0,1)
+for (i in 3:20) {
+  fib[[i]] <- fib[[i-1]] + fib[[i-2]]
+  print(i)
+  print(fib)
+}
+
+fib_hossz = 20
+fib <- c(0,1)
+for (i in 3:fib_hossz){
+  fib <- c(fib,fib[i-1]+fib[i-2])
+}
+
+fib_szamok
+
 x <- fib(fib_hossz=8)
 x
+
+fib <- function(x){
+  result <- c()
+  if(x==1){
+    result <- c(result,1)
+  }else  if(x==2){
+    result <- c(result,c(1,1))
+  }else{
+    result <- c(result, c(1,1))
+    for (i in 3:x){
+      result <- c(result,rev(result)[1]+rev(result)[2])
+    }
+  }
+  return(result)
+}
+
+fib(10)
+
 # 2 A tanultak alkalmazása elemzésnél ----
 
 # 2.1 Statisztikai függvények --------
@@ -179,6 +240,8 @@ x
 # az elemszám [length()] és a gyök [sqrt] függvények kombinálására:
 
 mtcars$mpg
+
+sd(mtcars$mpg)/sqrt(length(mtcars$mpg))
 
 sem <- function(data) {
     return(sd(data)/sqrt(length(data)))
@@ -194,7 +257,7 @@ sem(mtcars$mpg)
 # Értelmezzük az elkészített függvényt, mit csinál pontosan:
 
 
-CI <- function(dataset) {
+CI_err <- function(dataset) {
     if (length(dataset) > 30) {
         m = qnorm(0.975)
     }
@@ -204,12 +267,25 @@ CI <- function(dataset) {
     return(m*sem(dataset))
 }
 
-CI(mtcars$mpg)
+CI_err(mtcars$mpg)
 
 # 2.1.1 Feladat ------------
 # Készítsünk olyan függvényt, ami megadja a konfidencia-intervallum
 # átlagtól számított alsó és felső határát egy vektorban!
 
+CI <- function(dataset){
+  sem <- sd(dataset)/sqrt(length(dataset))
+  if (length(dataset) > 30) {
+    m = qnorm(0.975)
+  }
+  else {
+    m = qt(0.975,df=(length(dataset)-1))
+  }
+  return(c(mean(dataset)-m*sem,mean(dataset)+m*sem))
+  }  
+
+
+CI(mtcars$mpg)
 
 # 2.2 Könyvtárak saját függvényeinek módosítása --------
 
