@@ -402,6 +402,47 @@ v2 <- c(3, 7, 4, 2, 123, 5678, 134, 23, 57, 23324)
 
 # Íjrunk egy olyan parancsot, ami megkeresi az x-nél kisebb összes prímszámot!
 
+# x <- 5000
+primek <- c(2)
+max_prim = 5000
+i = 0
+while (i < max_prim){
+  prim_e <- T
+  for (prim in primek){
+    if (i%%prim==0){
+      prim_e = F
+      break
+    }
+    if(prim_e){
+      primek <- append(primek,i)
+    }
+    
+  }
+  i = i + 1
+}
+print(primek)
+
+
+x <- 5000
+
+primek <- c()
+for (i in 2:x){
+  prim_e = T
+  for(j in seq(2,sqrt(i))){
+    # print(1:i)
+    # print(j)
+    if(i%%j==0){
+      prim_e = F
+      break
+    }
+  }
+  if(prim_e){
+    primek <- append(primek,i)
+  }
+}
+
+primek
+
 # Gyakorlati alkalamzás
 
 # 5 Gyakorlati alkalmazás ----------
@@ -418,6 +459,8 @@ str(iris)
 ggplot(data=iris, aes(Sepal.Length)) + 
   geom_histogram()
 
+hist(iris$Sepal.Length)
+hist(iris[['Sepal.Length']])
 # Ez sajnos nem lesz jó nekünk, mert az NSE változókat nem tudjuk listába rakni
 # Ebben segít az aes_string(): Hasonló, mint az aes(), de stringként kéri a változónevet
 # Megj.: az NSE-ről bővebben a következő órán beszélünk
@@ -441,12 +484,17 @@ typeof(iris[[colname]])
 # Ellenőrizzük, hogy az oszlop számokat tartalmaz:
 is.numeric(iris[[colname]])
 
+iris_plots <- list()
+
+# iris_plots['szeprvirag'] <- 2
+
 for (colname in colnames(iris)) { # Menjünk végig az összes oszlopon
   if(is.numeric(iris[[colname]])){ # Ellenőrizzük, hogy a változó számadatot tartalmaz
-    print( # A ggplot-nak szüksége van a print függvényre a cikluson belül, hogy outputot kapjunk
-      ggplot(data=iris, aes_string(colname)) +
-        geom_histogram()
-    )
+     # A ggplot-nak szüksége van a print függvényre a cikluson belül, hogy outputot kapjunk
+    p <- ggplot(data=iris, aes_string(colname)) +
+      geom_histogram()
+    iris_plots[[colname]] <- p
+    
     cat(c('Ábrázolva: ',colname,'\n')) # Visszajelzés nekünk
   }else{
     cat(c('Nem tudom ábrázolni: ',colname,'\n')) # Visszajelzés nekünk
@@ -500,6 +548,8 @@ print(cut_plots$Premium$depth)
 
 # A grid.arrange rácsos szerkezetben egyszerre több plotot is képes megjeleníteni.
 grid.arrange(cut_plots$Premium$table,cut_plots$Premium$depth)
+
+grid.arrange(cut_plots$Premium$table,cut_plots$Premium$depth,cut_plots$Ideal$table)
 
 # Igen ám, de hogy tudunk plotot kérni egy változópárra?
 grid.arrange(cut_plots$Premium)
