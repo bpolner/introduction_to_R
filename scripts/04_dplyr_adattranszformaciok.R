@@ -174,7 +174,7 @@ select(flights, year:day)
 select(flights, -(year:day))
 
 # Hasznos segedfuggvenyek 
-# http://dplyr.tidyverse.org/reference/select_helpers.html 
+# https://www.rdocumentation.org/packages/dplyr/versions/0.7.2/topics/select_helpers
 
 select(flights, starts_with("dep"))
 select(flights, ends_with("time"))
