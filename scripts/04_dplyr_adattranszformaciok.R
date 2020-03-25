@@ -218,6 +218,11 @@ select(flights, time_hour, air_time, everything())
 # Tipp: bár megoldható a select() használatával is, de van ennél sokkal elegánsabb megoldás is a dpylr-ben!
 
 
+# 4) Válaszd ki a flights tábla második, ötödik, és tizenegyedik oszlopát! 
+# Használd a select függvényt, de a változók neveit nem használhatod!
+
+
+
 #### 4. Uj valtozok szamolasa: mutate() --------------------------------------
 
 # Válasszunk ki néhány oszlopot, hogy a konzolon is jól lássuk, 
@@ -541,11 +546,11 @@ iris %>%
 
 # Több összefoglalás egyszerre:
 
-# a) függvények felsorolása a funs()-on belül
+# a) függvények felsorolása egy listában
 
 iris %>% 
   group_by(Species) %>% 
-  summarise_all(funs(median, mean))
+  summarise_all(list("Med" = median, "M" = mean))
 
 # b) függvények nevének megadása karaktervektorban
 
