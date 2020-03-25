@@ -242,8 +242,8 @@ flights_sml <-
 
 mutate(
   flights_sml,
-  gain = arr_delay - dep_delay,
-  speed = distance / air_time * 60
+  gain = arr_delay - dep_delay,    # mennyi késést szedett fel menet közben a gép?
+  speed = distance / air_time * 60 # átlagos sebesség (mérföld / óra)
 )
 
 
@@ -251,9 +251,9 @@ mutate(
 
 mutate(
   flights_sml,
-  gain = arr_delay - dep_delay,
-  hours = air_time / 60,
-  gain_per_hour = gain / hours
+  gain = arr_delay - dep_delay, # mennyi késést szedett fel menet közben a gép?
+  hours = air_time / 60,        # hány órát volt a levegőben a gép?
+  gain_per_hour = gain / hours  # óráként átlagosan mennyivel nőtt a késés?
 )
 
 
@@ -273,7 +273,10 @@ transmute(
 
 # 4.1 Gyakorlás: mutate() -------------------------------------------------
 
-# Számold ki újra az indulási és érkezési késést!
+
+# 1) Számold ki újra az indulási és érkezési késést! 
+# Előtte gondolkozz el azon, hogy ehhez megfelelő formátumban vannak-e a tárolva az indulási és érkezési információk? 
+# Ha kell, a számítás előtt alakítsd át őket!
 
 
 
