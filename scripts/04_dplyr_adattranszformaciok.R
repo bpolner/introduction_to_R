@@ -7,20 +7,9 @@ library(nycflights13)
 
 #### 0. Elokeszuletek es alapok ----------------------------------------------
 
-
-flights
-# valtozok nevei alatti roviditesek jelzik a valtozok tipusat
-# int - integer = egesz szam
-# dbl - double = valos szam
-# chr - character = betulancok (strings)
-# dttm - date-time = datum es ido
-# lgl - logical = logikai
-# fctr - factor = kategorikus valtozok fix lehetseges ertekekkel
-# date - date = datum
-
 # A dplyr szintaxisanak alapjai:
 
-# Megfigyelesek kivalasztasa ertekeik alapjan: filter().
+# Sorok kivalasztasa ertekeik alapjan: filter().
 # Sorok ujrarendezese: arrange().
 # Valtozok kivalasztasa nev szerint: select().
 # Letezo valtozok alapjan uj valtozok szamolasa: mutate().
@@ -32,6 +21,18 @@ flights
 # Első argumentum mindig egy adattábla (data.frame)
 # Következő argumentumok: mit tegyünk az adattal, melyik változókkal (idézőjel nélkül)
 # Eredményül mindig egy adattáblát (data.frame) kapunk vissza
+
+# A flights adattáblán fogjuk kipróbálni, hogy mit tud a dplyr:
+
+flights
+# valtozok nevei alatti roviditesek jelzik a valtozok tipusat
+# int - integer = egesz szam
+# dbl - double = valos szam
+# chr - character = betulancok (strings)
+# dttm - date-time = datum es ido
+# lgl - logical = logikai
+# fctr - factor = kategorikus valtozok fix lehetseges ertekekkel
+# date - date = datum
 
 
 #### 1. Sorok szurese: filter()  --------------------------------
@@ -127,10 +128,15 @@ is.na(x)
 # c, tobb, mint ket orat kesett, pedig pontosan indult
 
 
+# d, a JFK repülőtérről indult, de nem Miamiba (MIA) érkezett
+
+
 # 2) Mire jo a between() fuggveny? 
 
 
 # 3) Hany jaratnak hianyzik az indulasi ideje (dep_time)?
+
+
 
 
 
@@ -202,6 +208,14 @@ select(flights, time_hour, air_time, everything())
 # kapcsolatos információ van! Utána következzenek azok az oszlopok, 
 # amelyek nevében szerepel a "time"! A táblából vedd ki a légitársaság, a 
 # járat, és a gép azonosítóit, illetve az induló- és a célállomást!
+
+
+# 2) Válaszd ki flights tábla year, month, day változóit
+# Ugyanebben a lépésben nevezd át az oszlopokat: a year legyen ev, a month honap, a day nap!
+
+
+# 3) Nevezd át a dep_time változót indulas-ra egy paranccsal úgy, hogy megtartod az összes oszlopot, az eredeti sorrendben!
+# Tipp: bár megoldható a select() használatával is, de van ennél sokkal elegánsabb megoldás is a dpylr-ben!
 
 
 #### 4. Uj valtozok szamolasa: mutate() --------------------------------------
