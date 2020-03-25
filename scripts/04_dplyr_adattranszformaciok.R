@@ -1,4 +1,4 @@
-####  Transzformaciok az adatok felfedezese soran a dplyr csomag hasznalataval
+####  Transzformaciok a dplyr csomag hasznalataval
 
 
 library(tidyverse)
