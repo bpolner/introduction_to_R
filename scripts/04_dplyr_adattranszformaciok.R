@@ -79,7 +79,7 @@ filter(flights, month == 11 | month == 12 | month == 3 | month == 1)
 # Tobb lehetseges ertek felsorolasa roviden (a fentivel ekvivalens)
 # (month értéke eleme a vektorral megadott halmaznak)
 
-nov_dec <- filter(flights, month %in% c(11, 12, 3, 1))
+nov_dec_mar_jan <- filter(flights, month %in% c(11, 12, 3, 1))
 
 
 # A hiányzó értékek (NA) megkeseríthetik az életünket, 
