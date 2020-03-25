@@ -215,7 +215,6 @@ select(flights, time_hour, air_time, everything())
 
 
 # 3) Nevezd át a dep_time változót indulas-ra egy paranccsal úgy, hogy megtartod az összes oszlopot, az eredeti sorrendben!
-# Tipp: bár megoldható a select() használatával is, de van ennél sokkal elegánsabb megoldás is a dpylr-ben!
 
 
 # 4) Válaszd ki a flights tábla második, ötödik, és tizenegyedik oszlopát! 
