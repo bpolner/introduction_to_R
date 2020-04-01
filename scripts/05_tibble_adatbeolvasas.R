@@ -1,10 +1,7 @@
 # A tibble. Fájlok olvasása és írása.
 
-require(tidyverse)
-# require(data.table)
-# require(microbenchmark)
-# require(nycflights13)
-# require(feather)
+library(tidyverse)
+
 
 
 # 1. A tibble ----------------------------------------------------------------
