@@ -103,7 +103,6 @@ df[["x"]]
 df[[1]]
 
 # Ha egy pipe-ban szeretnénk használni, használjuk a . helyőrzőt!
-# (pipe %>% operátorról később!)
 
 df %>% .$x
 
