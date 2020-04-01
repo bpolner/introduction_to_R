@@ -117,19 +117,23 @@ df$z
 # Ilyenkor konvertaljuk az adatainkat data.frame-é:
 
 as.data.frame(df)
-class(as.data.frame(df))
 
 
 # 1.1 tibble - gyakorlas ----------------
 
-# 1) Ha egy valtozo neve egy változóban tarolva, hogyan lehet a valtozot kinyerni 
+# 1) Nyerd ki a diamonds táblából a color változót
+# a) név alapján!
+
+# b) pozíció alapján!
+
+
+# 2) Ha egy valtozo neve egy változóban tarolva, hogyan lehet a valtozot kinyerni 
 # egy tibble-bol? mpg adatokban van a cty valtozo
 
 var <- "cty"
 
-mpg[[var]]
 
-# 2) Hasonlítsd össze a következő műveleteket data.frame-n és
+# 3) Hasonlítsd össze a következő műveleteket data.frame-n és
 # egy egyező tibble-n! Mi a különbség? 
 # Mi lehet a gond a data.frame működésében?
 
