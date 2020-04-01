@@ -58,7 +58,7 @@ mpg
 
 # Megjelenített sorok számának és a konzolra nyomtatott adatok szélességének szabályozása:
 
-print(mpg, n = 10, width = 10)
+print(mpg, n = 20, width = 100)
 
 # Modosithatjuk az alapbeallitasokat is
 
@@ -537,33 +537,6 @@ type_convert(challenge_2)
 # http://r4ds.had.co.nz/data-import.html#parsing-a-file
 
 
-# 2.5 data.table ------------------------------------------
-# fread
-
-# Nagyon gyors, és "okos" beolvasás
-
-# Nézzük meg, mennyi idő alatt olvassa be a flights adattáblát 
-# a read.csv, a read_csv, és az fread!
-
-# Előbb írjuk ki csv-be az adatokat
-
-data(flights)
-
-path <- file.path("data", "flights.csv")
-
-fwrite(flights, path, sep = ",", dec = ".")
-
-# Hasonlítsuk össze a három beolvasó sebességét!
-
-microbenchmark(fread(path), read.csv(path), read_csv(path), times = 3L)
-
-# Olvassuk be csak az 5. oszlopot, és csak a fejléc utáni első száz sort!
-
-fl <- fread(path, select = 5, nrows = 100)
-
-# oszlopok kihagyása: drop argumentum
-
-# data.table bővebben: vignette-k és DataCamp kurzus
 
 
 # 3. Fájlba írás ----------------------------------------------------------
