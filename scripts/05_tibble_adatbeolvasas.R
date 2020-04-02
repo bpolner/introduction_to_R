@@ -546,6 +546,20 @@ type_convert(challenge_2)
 # Hogyan találja ki a type_convert a típust? 
 # http://r4ds.had.co.nz/data-import.html#parsing-a-file
 
+# 2.4 fájlok elemzése - gyakorlás
+
+# 1) A data könyvtárban a recog_data.csv fájl egy felismerési teszt eredményeit tartalmazza egy sajátos formátumban.
+# Az első oszlopban a résztvevő azonosítója, a másodikban a felismerési pontosság %-ban megadva, 
+# a harmadik oszlopban pedig a résztvevő életkora. 
+# Akinél nincs meg az életkor, annál azt írták a táblázatba, hogy "nem ismert".
+# A legfelső sorban a kísérlet neve szerepel.
+# Olvasd be és dolgozd fel az adatokat, ügyelve arra, hogy
+# - a kísérlet neve ne legyen része a beolvasott tibble-nek 
+# - adj az oszlopoknak értelmes neveket már a beolvasásnál 
+# - a hiányzó adatok NA-nak legyenek beolvasva
+# - a beolvasás után a százalékos pontosság legyen 0 és 1 közötti tizedestörtté alakítva (mutate)
+
+
 
 
 
