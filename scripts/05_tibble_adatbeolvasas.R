@@ -298,10 +298,9 @@ read_csv("a,b,c\n1,2,.", na = ".")
 # Viszont azt szeretnénk, hogy az első oszlop neve "age", a második oszlop neve pedig "digitspan" legyen. 
 # Olvasd be egy tibble-be ennek megfelelően a digitspan_data.txt-t!
 
-read_csv("data/digitspan_data.txt", skip = 2, col_names = c("age", "digitspan"))
 
 
-# Mi a gond ezekkel a kódból megadott csv fájlokkal?
+# 2) Mi a gond ezekkel a kódból megadott csv fájlokkal?
 
 read_csv("a,b\n1,2,3\n4,5,6")
 read_csv("a,b,c\n1,2\n1,2,3,4")
