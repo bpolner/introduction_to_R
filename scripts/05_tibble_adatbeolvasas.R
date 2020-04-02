@@ -155,7 +155,7 @@ df_t[, c("abc", "xyz")]
 # meg kell mondani a függvénynek, hogy hol van a fájl, amit 
 # be szeretnénk tölteni az R-be.
 
-magas <- read.csv("C://Users/Polner Bertalan/Dropbox/oktatás/R_bevezetes/data/magassagok_1.txt")
+magas <- read.csv("C://Users/Berci/teaching/introduction_to_R/data/magassagok_1.txt")
 
 # Ez azonban kényelmetlen lehet, ha szeretnénk, 
 # hogy több gépen is működjön a kód.
