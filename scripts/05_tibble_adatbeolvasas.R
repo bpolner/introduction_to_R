@@ -159,7 +159,11 @@ magas <- read.csv("C://Users/Berci/teaching/introduction_to_R/data/magassagok_1.
 
 # Ez azonban kényelmetlen lehet, ha szeretnénk, 
 # hogy több gépen is működjön a kód.
+# Például a te gépeden elég valószínű, hogy nem fog működni.
 # Megoldás, ha RStudio projektet használunk.
+
+# Ilyenkor az .RProj fájlt tartalmazó projektmappa lesz a "kiindulópont". 
+# Ez az elérési út működni fog más gépen is, ha az introduction_to_R.RProj projekt meg van nyitva.
 
 magas <- read.csv("data/magassagok_1.txt")
 
@@ -225,7 +229,7 @@ data_path <- "data"
 
 path <- file.path(data_path, "magassagok_1.txt")
 
-read_csv(path, n_max = 1 )
+read_csv(path)
 
 # Meg lehet adni a bemenet csv fajlt a fuggveny hivasakor is
 # Igy lehet probalgatni a readr mukodeset
