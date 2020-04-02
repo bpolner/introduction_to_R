@@ -477,8 +477,6 @@ guess_parser(c("TRUE", "FALSE"))
 guess_parser(c("1", "5", "9"))
 guess_parser(c("12,352,561"))
 
-str(parse_guess("2010-11-01"))
-
 # De lehet, hogy az első 1000 sor speciális, pl.
 # - első 1000 sorban egész szám van, de később jönnek tizedestörtek is
 # - első 1000 sorban NA van, később jönnek az értékek 
@@ -554,7 +552,6 @@ type_convert(challenge_2)
 # 3. Fájlba írás ----------------------------------------------------------
 
 # readr: write_tsv és write_csv
-# data.table: fwrite
 
 # Könnyen olvasható fájlokat írnak:
 # - karakterláncokat UTF-8-ban kódolják
@@ -569,7 +566,7 @@ ch_again <- read_csv("challenge_out.csv")
 # Az oszlopok típusa elveszett időközben!
 # Mikor lehet ez zavaró?
 
-# Alternatívák:
+# Alternatívák: fájlba írunk komplett objektumokat
 
 # a, RDS (R saját bináris fájlformátuma)
 
@@ -577,7 +574,9 @@ write_rds(challenge, "challenge_out.RDS")
 
 (ch_rds <- read_rds("challenge_out.RDS"))
 
-# b, feather (gyors bináris fájlformátum, más nyelvek is "értik")
+# b, feather (gyors bináris fájlformátum, más nyelvek is "értik") (feather csomag kell hozzá!)
+# install.packages("feather)
+# library(feather)
 
 write_feather(challenge, "challenge.feather")
 
