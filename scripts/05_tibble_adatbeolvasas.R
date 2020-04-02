@@ -462,7 +462,7 @@ parse_date("01/02/15", "%d/%m/%y") # nap/hónap/év, tehát február 1.
 
 parse_date("01/02/15", "%m/%d/%y") # hónap/nap/év, tehát január 2.
 
-parse_date("Jan 23 2015", "%b %d %Y") 
+parse_date("Jan 23 2015", "%b %d %Y") # <hónap rövid neve> <nap> <év>
 
 
 
