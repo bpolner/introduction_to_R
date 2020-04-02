@@ -458,10 +458,11 @@ parse_time("20:10:01")
 # részleteket lásd https://r4ds.had.co.nz/data-import.html#readr-datetimes 
 
 
-parse_date("01/02/15", "%d/%m/%y")
-parse_date("01/02/15", "%d/%m/%y")
+parse_date("01/02/15", "%d/%m/%y") # nap/hónap/év, tehát február 1.
 
-parse_date("Jan 23 2015", "%b %d %Y")
+parse_date("01/02/15", "%m/%d/%y") # hónap/nap/év, tehát január 2.
+
+parse_date("Jan 23 2015", "%b %d %Y") 
 
 
 
