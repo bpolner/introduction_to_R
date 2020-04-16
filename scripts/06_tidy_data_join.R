@@ -73,7 +73,7 @@ table4a
 table4a %>% 
     gather(`1999`, `2000`, key = "year", value = "cases")
 
-# Az oszlopokat úgy határozzuk meg, mint a dplyr::select()-nél.
+# Az oszlopokat úgy jelöljük ki, mint a dplyr::select()-nél.
 
 
 # Hasonloan eljarhatunk a table4b eseteben is, csak itt ugye
