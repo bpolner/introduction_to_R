@@ -15,7 +15,7 @@ output:
 
 ```{r, include=FALSE}
 # ezzel a sorral állíthatnánk be, hogy a kód ne kerüljön bele a knittelt doksiba
-knitr::opts_chunk$set(echo=FALSE)
+# knitr::opts_chunk$set(echo=FALSE)
 ```
 
 Töltsünk be egy pár csomagot!
