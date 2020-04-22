@@ -26,8 +26,6 @@ library(htmlwidgets)
 library(GGally)
 library(gridExtra)
 library(corrplot)
-library(plotly)
-library(htmlwidgets)
 library(patchwork)
 ```
 
