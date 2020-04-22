@@ -28,6 +28,7 @@ library(gridExtra)
 library(corrplot)
 library(plotly)
 library(htmlwidgets)
+library(patchwork)
 ```
 
 
@@ -424,6 +425,9 @@ model <-
   lm(mpg ~  ., data = .)
 
 summary(model)
+```
+
+```{r}
 confint(model)
 ```
 
@@ -479,7 +483,7 @@ psych::bfi %>%
 
 # Több panelből álló ábrák 
 
-gridArrange csomag
+## gridArrange csomag
 
 ```{r, message=FALSE, fig.width=15}
 p1 <- ggplot(diamonds) + 
@@ -503,6 +507,12 @@ grid.arrange(p1, p2, p3,
 ```
 
 [További lehetőségek több panelből álló ábrák szerkesztésére](https://cran.r-project.org/web/packages/egg/vignettes/Ecosystem.html)
+
+## patchwork csomag
+
+```{r}
+p1 + p2 + p3 + plot_layout(ncol = 2)
+```
 
 
 #Interaktív ábrák a plotly-vel
