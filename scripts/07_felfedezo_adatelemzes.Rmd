@@ -12,14 +12,13 @@ output:
 
 [Az R Notebookról bővebben](https://bookdown.org/yihui/rmarkdown/notebook.html)
 
-
 ```{r, include=FALSE}
 # ezzel a sorral állíthatnánk be, hogy a kód ne kerüljön bele a knittelt doksiba
 # knitr::opts_chunk$set(echo=FALSE)
 ```
 
 Töltsünk be egy pár csomagot!
-```{r, message=FALSE, warning=FALSE}
+```{r}
 library(tidyverse)
 library(plotly)
 library(htmlwidgets)
