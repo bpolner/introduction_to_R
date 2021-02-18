@@ -19,7 +19,8 @@ ggplot(data = diamonds) +
 
 # Mi van az x tengelyen? Es mi van az y tengelyen?
 
-# Egyes geom-ok uj ertekeket szamitanak az abrazolashoz a stat algoritmussal
+# Az y tengelyen a darabszám látszik - ez nincs is benne az adattáblában! 
+# Egyes geom-ok uj ertekeket szamitanak az abrazolashoz egy algoritmussal, ezt nevezzük az adott geom stat-jának
 
 # Milyen ertekeket szamol a geom_bar()?
 
@@ -31,32 +32,42 @@ ggplot(data = diamonds) +
 
 ## 6.1 Statisztikai transzformaciok explicit meghatarozasa ----------------
 
-# A geom_bar() stat argumentumanak felulirasa: mutassa a valtozok erteket 
-ggplot(data = diamonds) + 
-    geom_bar(mapping = aes(x = cut, y = price), stat = "identity")
+# A geom_bar() stat argumentumanak felulirasa: 
 
-# Az ertekek exponencialis (tudomanyos) formaban vannak az y tengelyen
+
+# a, mutassa a valtozok nyers erteket 
+
+# Meghatározunk egy adattáblát, amiben már benne vagyok a csiszolások darabszámai
+# (ennek a szintaxisát majd később megnézzük részletesen!)
+demo <- tribble(
+  ~cut,         ~freq,
+  "Fair",       1610,
+  "Good",       4906,
+  "Very Good",  12082,
+  "Premium",    13791,
+  "Ideal",      21551
+)
+
+ggplot(data = demo) +
+  geom_bar(mapping = aes(x = cut, y = freq), stat = "identity")
+
+# b, mutasson egy másik számított értéket 
 
 # Lassuk inkabb az aranyokat a mennyiseg helyett
 ggplot(data = diamonds) + 
-    geom_bar(mapping = aes(x = cut, y = ..prop.., group = 1))
-
-ggplot(data = diamonds) + 
-  geom_bar(mapping = aes(x = cut, y = ..prop..))
-
-# Mire valo a group argumentum? Probaljuk ki a sugoban levo peldakat!
-?group
+    geom_bar(mapping = aes(x = cut, y = stat(prop), group = 1))
 
 
-# Statisztikai szamitasok reszletezese
-# y ertek statisztikai osszefoglalasa x minden egyedi ertekere
+# c, Ha jobban ki akarjuk fejteni a statisztikai szamitasokat
+
+# stat_summary(): y ertek statisztikai osszefoglalasa x minden egyedi ertekere
 
 ggplot(data = diamonds) + 
     stat_summary(
         mapping = aes(x = cut, y = depth),
-        fun.ymin = min,
-        fun.ymax = max,
-        fun.y = median
+        fun.min = min,
+        fun.max = max,
+        fun = median
     ) 
 
 
@@ -77,13 +88,13 @@ ggplot(data = diamonds) +
 # 4) Az aranyokat mutato oszlopdiagram kodjaban miert van group=1?
 # Mi a problema a ket alatta meghatarozott abraval?
 ggplot(data = diamonds) +
-    geom_bar(mapping = aes(x = cut, y = ..prop.., group = 1))
+    geom_bar(mapping = aes(x = cut, y = stat(prop), group = 1))
 
 ggplot(data = diamonds) + 
-    geom_bar(mapping = aes(x = cut, y = ..prop..))
+  geom_bar(mapping = aes(x = cut, y = after_stat(prop)))
 
 ggplot(data = diamonds) + 
-    geom_bar(mapping = aes(x = cut, fill = color, y = ..prop..))
+  geom_bar(mapping = aes(x = cut, fill = color, y = after_stat(prop)))
 
 #### 7. A pozicio finomhangolasa --------------------------------
 
@@ -98,10 +109,17 @@ ggplot(data = diamonds) +
 ggplot(data = diamonds) + 
     geom_bar(mapping = aes(x = cut, fill = clarity))
 
+# Automatikusan fel lettek "polcolva" (stacked) az oszlopok
+# Minden egyes téglalap a csiszolás (cut) és a tisztaság (clarity) egy-egy kombinációt mutatja
+
 ## 7.1 A position argumentum ----------------
 
-# position="identity" atfedes miatt oszlopoknal nem szerencses
-# Amint az lathato, ha attetszore allitjuk az oszlopokat
+# Milyen oszlopdiagramot lehet még készíteni?
+
+# a, "identity" minden objektumot oda rak ahová esik a koordinátarendszeren belül
+# atfedes miatt oszlopoknal nem szerencses
+
+# Ez lathato, ha attetszore allitjuk az oszlopokat
 ggplot(data = diamonds, mapping = aes(x = cut, fill = clarity)) + 
     geom_bar(alpha = 1/5, position = "identity")
 
@@ -109,29 +127,36 @@ ggplot(data = diamonds, mapping = aes(x = cut, fill = clarity)) +
 ggplot(data = diamonds, mapping = aes(x = cut, colour = clarity)) + 
     geom_bar(fill = NA, position = "identity")
 
-# position="fill" jo, ha aranyokat akarunk osszehasonlitani
+# b, position="fill" jo, ha aranyokat akarunk osszehasonlitani
 ggplot(data = diamonds) + 
     geom_bar(mapping = aes(x = cut, fill = clarity), position = "fill")
 
 # Vessük össze az ábrát a gyakorisági táblázattal!
 table(diamonds$cut, diamonds$clarity)
 
-# position="dodge" egymas melle pakolja az oszlopokat
+# c, position = "dodge" egymas melle pakolja az oszlopokat
 # Ertekek kozvetlen osszevetesehez nagyon jo
+
+
 ggplot(data = diamonds) + 
     geom_bar(mapping = aes(x = cut, fill = clarity), position = "dodge")
+
+# d, van még egy opció, ami pontfelhőknél nagyon jó
 
 # Mi lehet a problema egy ilyen pontfelhovel?
 ggplot(data = mpg) + 
     geom_point(mapping = aes(x = displ, y = hwy))
 
+
 # Adjunk egy kis "zajt" az adatokhoz, hogy ne egymason legyen a pontok
 ggplot(data = mpg) + 
     geom_point(mapping = aes(x = displ, y = hwy), position = "jitter")
+
 # Ugyanez rovidebben
 ggplot(data = mpg) +
     geom_jitter(mapping = aes(x = displ, y = hwy), width = 0.1)
 
+# Nézzük meg, melyik displ+hwy kombinációban van több átfedő adatpont
 ggplot(data = mpg) +
   geom_count(mapping = aes(x = displ, y = hwy), alpha = 0.5)
 
@@ -149,15 +174,26 @@ ggplot(data = mpg, mapping = aes(x = cty, y = hwy)) +
 
 #### 8. Koordinata-rendszerek  --------------------------------
 
-# x es y tengely felcserelese a coord_flip() fuggvennyel
+# Az alapbeállítás a karteziánus koordináta-rendszer
+# x és y értéke határozza meg a pontok helyét
+# van még néhány további lehetőség is
+
+
+# a, x es y tengely felcserelese a coord_flip() fuggvennyel
+
+# ha az x tengelyen egymásba nyúlnak az egyes értékek címkéi
+
 ggplot(data = mpg, mapping = aes(x = class, y = hwy)) + 
     geom_boxplot()
+
 
 ggplot(data = mpg, mapping = aes(x = class, y = hwy)) + 
     geom_boxplot() +
     coord_flip()
 
-# "Polaris" koordinatarendszer a coord_polar() fugvennyel
+
+# b, "Polaris" koordinatarendszer a coord_polar() fugvennyel
+
 bar <- ggplot(data = diamonds) + 
     geom_bar(
         mapping = aes(x = cut, fill = cut), 
