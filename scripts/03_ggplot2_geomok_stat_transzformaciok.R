@@ -237,5 +237,46 @@ ggplot(data = mpg, mapping = aes(x = cty, y = hwy)) +
 # Tobbire van mukodokepes default, ami felulirhato.
 
 
-# Kérdés: mi lehet a limitációja annak, ha a csoportok közötti különbségeket oszlopdiagramokkal 
-# mutatjuk meg? Hogyan lehetne ezt orvosolni?
+# 10. Egy kis ggplot2 egy másik adattal -----------------------------------
+
+
+# Most nézzük a swiss beépített adathalmazt!
+# Betöltése:
+data(swiss)
+
+# 1) Hány sorból és hány oszlopból áll az adattábla? 
+
+# 2) Mit tartalmaznak a táblázat sorai?
+
+
+# 3) Készíts pontfelhőt, ami bemutatja a kapcsolatot 
+# a mezőgazdaságban dolgozó férfiak aránya és az 
+# iskolázottsági mutató között!
+
+
+# 4) Egy másik pontfelhőn szemléltesd a katolikusok aránya
+# és a katoni vizsgálaton legjobb értékelést elértek aránya (Examination)
+# közötti összefüggést!
+
+
+# 5) Ábrázold pontfelhőn a mezőgazdaságban dolgozók aránya és a 
+# katoni vizsgálaton legjobb értékelést elértek aránya (Examination)
+# közötti összefüggést! 
+# A megjelenítéshez használj teli négyzeteket, méretüket 
+# állítsd 5-ösre! Tetszés szerint állítsd be a körvonal színét, 
+# és a négyzetek áttetszőségét!
+# Az összefüggést szemléltesd két külön faceten az inkább katolikus, 
+# és az inkább protestáns "provinciák" esetében!
+# A négyzetek kitöltőszíne tükrözze a katolikusok arányát!
+# A négyzetek körvonalát állítsd vastagabbra 
+# (a geom_point dokumentációjából kiderül, hogyan)!
+
+
+# 6) Ábrázold kettő, az eddigi feladatokban nem szereplő, tetszőleges változó kapcsolatát, 
+# egy harmadik változón alapuló csoportbontás szerint! 
+
+
+# További javasolt gyakorlás: data() futtatásával megjelenik az összes beépített adathalmaz. 
+# ?<ADATHALMAZ NEVE> futtatásával megnézheted az adatok dokumentációját.
+# data(<ADATHALMAZ NEVE>) futtatásával pedig betöltheted az adatokat a workspace-re.
+# Az eddig tanultakat felhasználva készíts ábrákat egy választott adathalmazról!
