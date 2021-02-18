@@ -157,7 +157,7 @@ ggplot(data = mpg) +
 ggplot(data = mpg) + 
   geom_point(mapping = aes(x = displ, y = hwy)) + 
   # formula formátuma facet_grid esetében:
-  # <változó az x tg-re> ~ <változó az y tg-re>
+  # <változó az y tg-re> ~ <változó az x tg-re>
   facet_grid(drv ~ class)
 
 # facet_grid létrehozható csak egy változó szerint is:
