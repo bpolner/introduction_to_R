@@ -18,7 +18,7 @@ library(nycflights13)
 # Műveletek csoportonként: group_by().
 
 # Működésük: 
-# Első argumentum mindig egy adattábla (data.frame)
+# Első argumentum mindig egy adattábla 
 # Következő argumentumok: mit tegyünk az adattal, melyik változókkal (idézőjel nélkül)
 # Eredményül mindig egy adattáblát (data.frame) kapunk vissza
 
@@ -34,6 +34,10 @@ flights
 # fctr - factor = kategorikus valtozok fix lehetseges ertekekkel
 # date - date = datum
 
+# A konzolon nem látszik sem az összes változó, sem az összes sor
+# Ha jobban meg akarjuk nézni az adattáblát:
+
+View(flights)
 
 #### 1. Sorok szurese: filter()  --------------------------------
 
@@ -45,10 +49,13 @@ filter(flights, month == 1, day == 1)
 
 # A dplyr függvények sosem módosítják a bemenetet. 
 # Az eredmény tárolásához hozzá kell rendeljük egy változóhoz: 
+# <- a hozzárendelés jele, RStudioban (Win): alt + "-" az alap gyorsbillentyű
+# (További gyorsbillentyűk: Tools / Keyboard shortcuts help)
 
 jan1 <- filter(flights, month == 1, day == 1)
 
-# Egyszerre taroljuk, es nezzuk is meg a szűrés eredményét
+# Egyszerre taroljuk, es nezzuk is meg a szűrés eredményét: 
+# az egész hozzárendelést ()-be csomagoljuk
 
 (dec25 <- filter(flights, month == 12, day == 25))
 
@@ -59,7 +66,7 @@ jan1 <- filter(flights, month == 1, day == 1)
 
 filter(flights, month = 1)
 
-# Anomáliák a == használata során:
+# Anomáliák a == használata során tizedestörtekkel:
 
 sqrt(2)^2 == 2
 1/49 * 49 == 1
@@ -82,8 +89,9 @@ filter(flights, month == 11 | month == 12 | month == 3 | month == 1)
 nov_dec_mar_jan <- filter(flights, month %in% c(11, 12, 3, 1))
 
 
-# A hiányzó értékek (NA) megkeseríthetik az életünket, 
+# A hiányzó értékek (NA mint "not available") megkeseríthetik az életünket, 
 # ha összehasonlításokat végzünk
+# a legtöbb műveletre igaz, hogy ha egy NA keveredik bele, akkor a kimenet is NA lesz
 
 NA > 5
 10 == NA
@@ -115,6 +123,21 @@ x == y
 
 is.na(x)
 
+# a filter csak azokat a sorokat tartja meg, ahol a logikai vizsgálat TRUE
+# ahol FALSE vagy NA, azokat eldobja
+# Ha meg akarjuk tartani a sorokat, ahol hiányzó érték van, ezt explicitté kell tenni
+
+# Egy mini példa-adat
+df <- tibble(x = c(1, NA, 3))
+# Így néz ki
+df
+
+# Alapbó a filter eldobja az NA-t
+filter(df, x > 1)
+
+# Külön jelezni kell, ha az NA-t is meg akarjuk tartani
+filter(df, is.na(x) | x > 1)
+
 
 # 1.1 Gyakorlas - filter() ------------------------------------------------
 
@@ -131,7 +154,10 @@ is.na(x)
 # d, a JFK repülőtérről indult, de nem Miamiba (MIA) érkezett
 
 
-# 2) Mire jo a between() fuggveny? 
+# e, éjfél és reggel 6 között indult (pontban éjfél és reggel 6 is legyenek benne)
+
+
+# 2) Mire jo a between() fuggveny? Tudnád-e a fenti kereséseket egyszerűsíteni vele? 
 
 
 # 3) Hany jaratnak hianyzik az indulasi ideje (dep_time)?
@@ -160,10 +186,15 @@ arrange(df, desc(x))
 
 # 2.1 Gyakorlas - arrange() -----------------------------------------------
 
+# Válaszolj az 1) és 2) kérdésre a flights táblát sorbarendezve!
+
 # 1) Melyik jaratok kestek a legtobbet? Es melyek indultak el leghamarabb?
 
 
 # 2) Melyik jaratok repultek a legmesszebbre? Es a legkisebb tavolsagra?
+
+
+# 3) Hogyan lehetne az arrange() függvénnyel a hiányzó értékeket előrehozni? 
 
 
 
@@ -179,15 +210,19 @@ select(flights, year:day)
 
 select(flights, -(year:day))
 
-# Hasznos segedfuggvenyek 
-# https://www.rdocumentation.org/packages/dplyr/versions/0.7.2/topics/select_helpers
+# Hasznos segedfuggvenyek https://dplyr.tidyverse.org/reference/select.html
 
+# Mivel kezdődik a változó neve
 select(flights, starts_with("dep"))
+
+# Hogyan végződik a változó neve
 select(flights, ends_with("time"))
+
+# Szerepel a változó nevében
 select(flights, contains("arr_") )
 
 
-# Valtozok atnevezesehez: rename()
+# Valtozok atnevezesehez: rename() (a többit változót megtartja)
 
 rename(flights, tail_num = tailnum)
 
@@ -208,6 +243,7 @@ select(flights, time_hour, air_time, everything())
 # kapcsolatos információ van! Utána következzenek azok az oszlopok, 
 # amelyek nevében szerepel a "time"! A táblából vedd ki a légitársaság, a 
 # járat, és a gép azonosítóit, illetve az induló- és a célállomást!
+# Próbáld meg minél többféle módon megoldani! 
 
 
 # 2) Válaszd ki flights tábla year, month, day változóit
@@ -220,6 +256,16 @@ select(flights, time_hour, air_time, everything())
 # 4) Válaszd ki a flights tábla második, ötödik, és tizenegyedik oszlopát! 
 # Használd a select függvényt, de a változók neveit nem használhatod!
 
+
+# 5) Meglepő eredményt ad ez a kód? 
+# Mi a segédfüggvények alapbeállítása a kisbetű/nagybetű kezelésére?
+# Hogyan lehet megváltoztatni? 
+
+select(flights, contains("TIME"))
+
+# 6) Mire jó az any_of()? Mire lehet jó, ha ezzel a vektorral együtt használjuk? 
+  
+valtozok <- c("year", "month", "day", "dep_delay", "arr_delay", "evszam")
 
 
 #### 4. Uj valtozok szamolasa: mutate() --------------------------------------
@@ -270,12 +316,70 @@ transmute(
 # (azaz bemenete vektor és egyező hosszúságú vektort ad vissza)
 # Bővebben: https://r4ds.had.co.nz/transform.html#add-new-variables-with-mutate 5.5.1
 
+# Néhány hasznos példa
+
+# A) aritmetikai műveletek: + - * / ^ 
+# - vektorizáltak az újrafelhasználási szabályok szerint:
+# ha az egyik paraméter rövidebb, automatikusan meg lesz hosszabbítva, hogy egyforma hosszúak legyenek
+# ez jól jön, ha pl. konstanssal akarunk osztani pl. percek száma / 60 
+# vagy ha az átlagtól való eltérést akarjuk kiszámolni y - mean(y)
+
+# B) moduláris aritmetika
+
+# maradékos osztás 
+
+6 %/% 4
+
+# maradékképzés 
+
+6 %% 4
+
+# C) logaritmus log() log2() log10() 
+
+# D) eltolások
+
+(x <- 1:10)
+lag(x)
+lead(x)
+
+# Különbség az előző elemtől
+
+x - lag(x)
+
+# Eltér-e az előző elemtől?
+
+x != lag(x)
+
+# E) kumulált és gördülő aggregálás (összeg, szorzat, min, max, átlag)
+# Kumulált összeg és átlag pl.: 
+x
+
+cumsum(x)
+
+cummean(x)
+
+# RccpRoll csomagban: gördülő aggregálás
+
+# F) logikai vizsgálat
+
+# G) Rangsorolás pl. 
+
+y <- c(1, 2, 2, NA, 3, 4)
+
+min_rank(y)
+
+min_rank(desc(y))
+
 # 4.1 Gyakorlás: mutate() -------------------------------------------------
 
 
 # 1) Számold ki újra az indulási és érkezési késést! 
 # Előtte gondolkozz el azon, hogy ehhez megfelelő formátumban vannak-e a tárolva az indulási és érkezési információk? 
 # Ha kell, a számítás előtt alakítsd át őket!
+
+# 2) Miért kapjuk az alábbi eredményt?
+
+1:3 + 1:10
 
 
 
@@ -322,7 +426,10 @@ ggplot(data = delay, mapping = aes(x = dist, y = delay)) +
   geom_smooth(se = FALSE)
 
 # Ez most 4 lepes volt: adatok csoportositasa, osszegzes, szures, majd ábrázolás.
-# A koztes adattáblák foloslegesek, jo lenne kihagyni oket.
+# A koztes adattáblák foloslegesek, ráadásul a dolgokat elnevezni fárasztó.
+# Szóval jo lenne kihagyni oket.
+
+# Na erre lesz jó a pipe azaz a %>% (CTRL + SHIFT + M az RStudio-ban Win alatt)
 
 flights %>% 
   group_by(dest) %>% 
@@ -337,7 +444,6 @@ flights %>%
   geom_smooth(se = FALSE)
 
 
-# %>% beszurasahoz Ctrl + Shift + M 
 # Mit csinal a %>% ?
 # x %>% f(y) = f(x, y)
 # Olvashatjuk úgy is, hogy %>% = "aztán": 
@@ -360,13 +466,14 @@ flights %>%
 not_cancelled <- flights %>% 
   filter(!is.na(dep_delay), !is.na(arr_delay))
 
-# Mi tortenik itt?
-
 not_cancelled %>% 
   group_by(year, month) %>% 
   summarise(mean = mean(dep_delay))
 
-# Nezzuk meg gepenkent (tailnum) az atl. indulasi kesest!
+#  Aggregálásnál érdemes figyelni, hogy mennyi adat alapján készült
+#  Erre jó a n() vagy a nem-hiányzó értékek számolása sum(!is.na(x))
+
+# Nezzuk meg mondjuk gepenkent (tailnum) az atl. indulasi kesest!
 
 delays <- 
   not_cancelled %>% 
@@ -416,6 +523,8 @@ not_cancelled %>%
 
 ## 5.2 Leiro statisztikak keszitesenel hasznos fuggvenyek. -----------------
 
+# Középérték: mean, median
+
 # Szorodas
 
 ?sd
@@ -441,15 +550,34 @@ not_cancelled %>%
     last = max(dep_time)
   )
 
+# Pozíció: first(2), nth(x, 2), last(x)
+
 not_cancelled %>% 
   group_by(year, month, day) %>% 
+  summarise(
+    first_dep = first(dep_time), 
+    last_dep = last(dep_time)
+  )
+
+# Ezt kiegészíti a rangokra szűrés
+# Ilyenkor minden megfigyelés külön sorban marad
+
+not_cancelled %>% 
+  group_by(year, month, day) %>% 
+  # Minden napon belül rangsorolunk indulási idő szerint
   mutate(r = min_rank(dep_time)) %>% 
-  filter(r %in% range(r))
+  # Azokat a sorokat tartjuk meg, amik adott napon belül a legkisebb 
+  # és a legnagyobb rangot kapták
+  filter(r %in% range(r)) %>% 
+  select(year:day, dep_time, r)
 
 # Darabszam
 
 ?n # darabszám
 ?n_distinct # egyedi esetek
+
+
+# Melyik célállomásra jár a legtöbb légitársaság?
 
 not_cancelled %>% 
   group_by(dest) %>% 
