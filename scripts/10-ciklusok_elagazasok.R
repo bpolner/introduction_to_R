@@ -588,11 +588,11 @@ dev.off() # Bezárjuk a fájlt és visszatérünk az IDE-ben történő plotolá
 stroop_dir <- 'data/stroop_rawdata/'
 stroop_files <- dir(stroop_dir)
 
-# itt is alkalamzhatjuk a head() és tail() parancsokat:
+# itt is alkalmazhatjuk a head() és tail() parancsokat:
 head(stroop_files)
 tail(stroop_files)
 
-# Szerertnénk minden fájlt beolvasni, ami tartalmazza a ".csv" kiterjesztést,
+# Szeretnénk minden fájlt beolvasni, ami tartalmazza a ".csv" kiterjesztést,
 # ám van egy zip fájlunk is!
 # Segítség: szöveg keresése szövegben a grepl() függvénnyel
 grepl('.csv','az_en_kis_mappam/proba_log.csv')
