@@ -296,7 +296,7 @@ print(v1)
 
 # Rövidebb megoldás:
 v1 <- c(v1,'f')
-v
+v1
 
 # 4.1.2.2 Vektor elemeinek száma és indexelés ----------
 
