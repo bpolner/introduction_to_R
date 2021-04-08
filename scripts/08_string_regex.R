@@ -1,6 +1,6 @@
 # String-ek és reguláris kifejezések 
 
-# Bevezetés az R programozásba (2018. április 12.)
+# Bevezetés az R programozásba 
 
 require(tidyverse)
 
@@ -141,6 +141,7 @@ str_2 <- "Második"
 str_3 <- "Harmadik"
 
 
+
 # 2 Reguláris kifejezések (regex) 1 .----
 
 # A reguláris kifejezésekkel leírhatunk mintázatokat stringekben
@@ -258,6 +259,7 @@ str_view(c("abc", "hhahad", "edhahjaja"), "abc|h")
 # a) amik ed-re (de nem eed-re) végződnek!
 
 
+
 # b) amik vége ing vagy ise!
 
 
@@ -267,12 +269,12 @@ str_view(c("abc", "hhahad", "edhahjaja"), "abc|h")
 
 x <- "1888 is the longest year in Roman numerals: MDCCCLXXXVIII"
 
-# Egyszer vagy egyszer sem ismétlődik a megelőző elem:
+# Egyszer vagy egyszer sem fordul elő a megelőző elem:
 # ?
 
 str_view(x, "CC?")
 
-# Egyszer vagy többször ismétlődik a megelőző elem: 
+# Egyszer vagy többször fordul elő a megelőző elem: 
 # +
 
 str_view(x, "CC+")
@@ -281,12 +283,13 @@ str_view(x, "C[LX]+")
 
 str_view(x, "C+L+X+")
 
-# Egyszer sem vagy többször ismétlődik a megelőző elem:
+# Egyszer sem vagy többször is előfordul a megelőző elem:
 # *
 
 str_view(x, "CS*L*X")
 
-# Az ismétlődés számának pontos meghatározása
+
+# Az előfordulás számának pontos meghatározása
 
 # {n}: pontosan n-szer
 
@@ -339,6 +342,7 @@ str_view("aaabbcddEEEE", "E*")
 # 3) Írjunk egy olyan regex-et, 
 # ami megtalálja azokat a szavakat, amik
 # ugyanolyan a karakterrel kezdődnek és végződnek!
+
 
 
 # 4 A regex alkalmazásai 1. ----
@@ -456,13 +460,18 @@ head(sentences)
 
 # Keressük ki azokat a mondatokat, amelyekben színekről van szó
 
-# Hozzunk létre egy vektort a színek neveivel?
+# Hozzunk létre egy vektort a színek neveivel:
 
 colours <- c("red", "orange", "green", "blue", "yellow", "purple")
 
 # Ebből hozzunk létre egy regex-et!
 
 colour_match <- str_c(colours, collapse = "|")
+
+# Probléma: ha más szóban szerepel egy szín neve, arra is jelez:
+
+str_view(c("hundred", "two red apples"), colour_match)
+
 
 # Ennek segítségével kinyerhetjük a színeket tartalmazó mondatokat
 
@@ -502,6 +511,7 @@ fn <- "(a|the) ([^ ]+)"
 van_fn <- sentences %>%
   str_subset(fn) %>%
   head(10)
+
 
 # Kiszedjük belőlük a főneveket:
 
