@@ -228,26 +228,18 @@ x[x < 5] <- 999
 
 # 1. Hozzunk letre egy otelemu vektort, ami tizzel kezdodik, es harmasaval novekedik! 
 #    Taroljuk a vektort az x valtozoban.
-x <- seq(from = 10, by = 3, length.out = 5)
 
 # 2. Emeljuk negyzetre az elobb letrehozott x vektort, es rendezzuk csokkeno sorrendbe!
 #    Taroluk ezt a vektort az y valtozoban. 
-y <- sort(x**2, decreasing = TRUE)
 
 # 3. Valogassuk ki z vektorbol a 10-nel nagyobb elemeket, es taroljuk a z2 vektorban.
 z <- c(3, .2, NA, 50, 4000, 10, 11)
 
-z[z > 10]
 
 # 4. A hianyzo adatok helyere tegyunk 0-t. Majd szamoljuk ki a vektor atlagat, minimum es 
 #    maximum erteket, es taroljuk ezeket a descr vektorban!
 numbers <- c(-4, 3.2, NA, NA, 100, 146, 98)
 
-numbers[is.na(numbers)] <- 0
-
-c(mean(numbers), min(numbers), max(numbers))
-
-replace(numbers, is.na(numbers), 0)
 
 ## Lista  ----------------
 
@@ -307,9 +299,6 @@ x <-
     masodik = list(egy_szam = 1, egy_sorozat = 4:7, beagyazott_lista = list(c(2, 1, 83),"nyerjük ki ezt a stringet") )
   )
 
-str(x)
-
-x[[2]][[3]][[2]]
 
 # Attribútumok ----
 
@@ -515,3 +504,29 @@ computeAverageScore()
 var1         <- 50
 b            <- "B"
 cutoff_point <- 0.5
+
+
+
+# Extra gyakorlás -------------------------------------------------------
+
+# 1) 
+
+# Készíts egy sorozatot, ami 12 elemből áll, és 2-től indul, és 13-mal növekszik! 
+# Tárold el ezt a sorozatot egy változóban!
+
+
+# Készíts ebből a sorozatból egy 3 sorból és 4 oszlopból álló mátrixot! 
+# A vektort soronként töltsd be mátrixba! 
+# Tárold el ezt a mátrixot is egy változóban! 
+
+
+# A mátrix páratlan elemeihez adj hozzá 1000-et, és az eredménnyel írd felül az eredeti mátrixot! 
+
+
+# Készíts egy 4 elemű listát, aminek az elemei a mátrix oszlopai 
+# Az elemeket nevezd el (pl. "első", "második", ...)
+
+
+# Nyerd ki a lista 1. elemének 3. elemét, és a 4. elem 2. elemét, és pakold őket egy karaktervektorba! 
+# Mentsd el ezt is egy változóba! 
+
