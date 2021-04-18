@@ -122,12 +122,6 @@ is.numeric(2)
 is.numeric('blabla')
 is.numeric('2')
 
-x <- 1
-if (is.numeric(x)) {
-  print(x+1)
-}else{
-  print(x)
-}
 
 # 3.4 Az else if kapcsoló ----------
 # Mi van, ha arra is szeretnenk egy kiirast, ha a szam pont 100?
@@ -403,45 +397,6 @@ v2 <- c(3, 7, 4, 2, 123, 5678, 134, 23, 57, 23324)
 # Íjrunk egy olyan parancsot, ami megkeresi az x-nél kisebb összes prímszámot!
 
 # x <- 5000
-primek <- c(2)
-max_prim = 5000
-i = 0
-while (i < max_prim){
-  prim_e <- T
-  for (prim in primek){
-    if (i%%prim==0){
-      prim_e = F
-      break
-    }
-    if(prim_e){
-      primek <- append(primek,i)
-    }
-    
-  }
-  i = i + 1
-}
-print(primek)
-
-
-x <- 5000
-
-primek <- c()
-for (i in 2:x){
-  prim_e = T
-  for(j in seq(2,sqrt(i))){
-    # print(1:i)
-    # print(j)
-    if(i%%j==0){
-      prim_e = F
-      break
-    }
-  }
-  if(prim_e){
-    primek <- append(primek,i)
-  }
-}
-
-primek
 
 # Gyakorlati alkalamzás
 
