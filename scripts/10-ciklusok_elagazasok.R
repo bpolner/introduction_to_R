@@ -398,8 +398,6 @@ v2 <- c(3, 7, 4, 2, 123, 5678, 134, 23, 57, 23324)
 
 # x <- 5000
 
-# Gyakorlati alkalamzás
-
 # 5 Gyakorlati alkalmazás ----------
 
 # 5.1 Ciklus használata data.frame-eken ábrázoláshoz ----------
