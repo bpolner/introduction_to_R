@@ -1,6 +1,6 @@
 # A *Bevezetés az R programozásba* kurzus anyagai / Course material for the *Introduction to R Programming* course (HU) 
 
-BME 2020-2021. tavaszi félév
+BME 2021-2022. tavaszi félév
 
 [Tematika / Syllabus (HU)](https://docs.google.com/document/d/1zeECbntXZ6_5nr9hHKTEDkm_gqhakV2TBGl8Mx0Kp1A/edit?usp=sharing)
 
