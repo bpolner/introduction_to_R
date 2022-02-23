@@ -272,8 +272,7 @@ ggplot(data = mpg, mapping = aes(x = displ, y = hwy)) +
 # 1) Melyik geom_ függvényt használnád... 
 #    vonaldiagram, boxplot, hisztogram készítéséhez?
 
-ggplot(data = mpg, mapping = aes(x = hwy)) + 
-  geom_histogram(binwidth = 1)
+
 
 # 2) A kód futtatása előtt írd le szavakkal, hogy fog kinézni az ábra!
 
