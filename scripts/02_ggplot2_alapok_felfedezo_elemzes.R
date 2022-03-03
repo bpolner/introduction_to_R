@@ -93,14 +93,14 @@ ggplot(data = mpg) +
 
 # Milyen formák közül választhatunk?
 
-minta_adat <- data.frame(x = 1:24, 
-                         y = 1:24, 
-                         z = factor(1:24)
+minta_adat <- data.frame(x = 0:25, 
+                         y = 0:25, 
+                         z = factor(0:25)
 )
 
 ggplot(data = minta_adat) +
   geom_point(aes(x = x, y = y, shape = z), colour = "black", fill = "red", size = 8) + 
-  scale_shape_manual(values = 1:24)
+  scale_shape_manual(values = 0:25)
 
 
 ## 3.1 Gyakorlas - esztétikai paraméterek ----------------
