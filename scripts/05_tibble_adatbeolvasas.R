@@ -471,6 +471,8 @@ parse_date("Jan 23 2015", "%b %d %Y") # <hónap rövid neve> <nap> <év>
 # Hogyan találja ki a readr a változók típusát?
 # Megnézi az első 1000 sort, és heurisztikákat alkalmaz
 
+# FRISSÍTÉS: read_csv újabb verziója alapbeállítás szerint az összes sort megnézi
+
 guess_parser("2010-10-01")
 guess_parser("15:01")
 guess_parser(c("TRUE", "FALSE"))
