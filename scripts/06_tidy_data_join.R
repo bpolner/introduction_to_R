@@ -340,7 +340,7 @@ stocks %>%
   )
 
 
-# 2.1 Mutating join -------------------------------------------------------
+# 2.1 Mutating joins -------------------------------------------------------
 
 # Egyezteti a megfigyeleseket a kulcsok alapjan, aztan 
 # egyik táblából a másikba masol valtozokat
@@ -500,9 +500,9 @@ flights2 %>%
 
   
 
-# 2.2 Filtering join ------------------------------------------------------
+# 2.2 Filtering joins ------------------------------------------------------
 
-# A logika hasonló, mint a mutating join-nak,
+# A logika hasonló, mint a mutating join-nál,
 # de csak a megfigyelésekre van hatással
 
 # semi_join(x, y) - megtart minden megfigyelést x-ből, aminek van párja y-ban
@@ -549,3 +549,41 @@ flights %>%
 
 # 2) Találd meg az évnek azt a 48 óráját, amikor a legtöbbet késtek a gépek!
 # Kösd össze a weather táblával. Látsz-e mintázatokat?
+
+
+
+# 2.3 Halmazműveletek ---------------------------------------------------------
+
+# Két tábla összevetésére is jók
+# Egész sorokon dolgoznak
+# Feltételezik, hogy mindkét tábla ugyanolyan változókból áll
+# A megfigyeléseket halmazokként kezelik
+
+# Metszet, unió és kivonás. Nézzük meg ezeken a példa adatokon!
+
+df1 <- tribble(
+  ~x, ~y,
+  1,  1,
+  2,  1
+)
+
+df2 <- tribble(
+  ~x, ~y,
+  1,  1,
+  1,  2
+)
+
+# Metszet: ami az elsőben és a másodikban is benne van
+
+intersect(df1, df2)
+
+# Unió: ami az elsőben vagy a másodikban vagy mindkettőben benne van 
+
+union(df1, df2)
+
+# Kivonás: ami az elsőben benne van, de a másodikban nincs benne
+
+setdiff(df1, df2)
+
+setdiff(df2, df1)
+
