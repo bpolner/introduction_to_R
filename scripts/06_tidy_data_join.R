@@ -17,11 +17,17 @@ table4a; table4b
 # 2. Minden megfigyeles kulon sor
 # 3. Minden ertek kulon cella
 
+# Praktikusan: 
+# 1. Minden adathalmaz egy tibble-ben legyen
+# 2. Minden változó egy oszlopban legyen
+
 # A fenti 4 pelda kozul melyik tekintheto tidy-nak (rendezettnek)?
 
-# Konzisztensen rendezett adatok segitik altalanos elvek alkalmazasat,
+# Miért jó ez nekünk?
+
+# - Konzisztensen rendezett adatok segitik altalanos elvek alkalmazasat,
 # amikor az adatokkal dolgozunk
-# tidyverse csomagjai feltetelezik az adatok rendezettseget
+# - A tidyverse csomagjai feltetelezik az adatok rendezettseget
 
 # Pl. 10 000 fore eso gyakorisagi arany
 table1 %>% 
@@ -58,9 +64,10 @@ ggplot(table1, aes(year, cases)) +
 # Általában egyszerre csak az egyik áll fenn.
 
 # Ezeket a problémákat orvosolja a tidyr két alapvető függvénye:
-# gather() és spread()
+# pivot_longer() és pivot_wider()
   
-# gather (=összegyűjtés): ha az oszlopnevek egy változó értékeit veszik fel
+# pivot_longer (=átalakítás hosszabb formátumba): 
+# ha az oszlopnevek egy változó értékeit veszik fel
 
 table4a
 
@@ -71,7 +78,7 @@ table4a
 # - Mi az a változó, aminek az értékei a cellákban vannak? (value)
 
 table4a %>% 
-    gather(`1999`, `2000`, key = "year", value = "cases")
+    pivot_longer(c(`1999`, `2000`), names_to = "year", values_to = "cases")
 
 # Az oszlopokat úgy jelöljük ki, mint a dplyr::select()-nél.
 
@@ -80,21 +87,21 @@ table4a %>%
 # egy másik változó értékei vannak a cellákban, módosítsuk a value paramétert!
 
 table4b %>% 
-    gather(`1999`, `2000`, key = "year", value = "population")
+    pivot_longer(c(`1999`, `2000`), names_to = "year", values_to = "population")
 
 # Ahhoz, hogy egy tibble-be kerüljenek az adataink, hasznaljuk a left_join()-t
 
 tidy4a <- table4a %>% 
-    gather(`1999`, `2000`, key = "year", value = "cases")
+  pivot_longer(c(`1999`, `2000`), names_to = "year", values_to = "cases")
 tidy4b <- table4b %>% 
-    gather(`1999`, `2000`, key = "year", value = "population")
-
+  pivot_longer(c(`1999`, `2000`), names_to = "year", values_to = "population")
 left_join(tidy4a, tidy4b)
+
 
 # Kicsit később lesz szó a join függvényekről is!
 
-# spread (=szétterítés): ha van egy oszlop, 
-# amiben változók nevei szerepelnek
+# pivot_wider (=átalakítás szélesebb formátumra): 
+# ha van egy oszlop, amiben változók nevei szerepelnek
 
 table2
 
@@ -102,13 +109,14 @@ table2
 # - Melyik az az oszlop, amelyik a változók neveit tartalmazza? (key)
 # - Melyik az az oszlop, ami több változó értékeit is tartalmazza? (value)
 
-spread(table2, key = type, value = count)
+table2 %>% 
+  pivot_wider(names_from = type, values_fill = count)
 
-# gather: szélesből hosszúba (wide to long)
-# spread: hosszúból szélesbe (long to wide)
+# pivot_longer: szélesebből hosszabba (wide to long)
+# pivot_wider: hosszabból szélesebbe (long to wide)
 
 
-# 1.1.1 Gyakorlas - spread es gather --------------------------------------
+# 1.1.1 Gyakorlas - pivot_longer és pivot_wider  --------------------------------------
 
 # 1) Rendezd a preg adatokat tidy formátumba!
 
@@ -126,10 +134,9 @@ stocks <- tibble(
   half  = c(   1,    2,     1,    2),
   return = c(1.88, 0.59, 0.92, 0.17)
 )
-
 stocks %>% 
-  spread(year, return) %>% 
-  gather("year", "return", `2015`:`2016`)
+  pivot_wider(names_from = year, values_from = return) %>% 
+  pivot_longer(`2015`:`2016`, names_to = "year", values_to = "return")
 
 # 3) Miért nem lehet szétteríteni ezt a táblát? Mit kellene tenni, hogy lehessen
 
@@ -223,19 +230,18 @@ stocks <- tibble(
 # Másfajta elrendezés explicitté teheti az összes hiányzó adatot
 
 stocks %>% 
-    spread(year, return)
+    pivot_wider(names_from = year, values_from = return)
 
 # Ha a hianyzo adatok explicit megjelenitese nem erdekes, implicitte tehetjuk
-# gather(na.rm = TRUE)
 
 stocks %>% 
-    spread(year, return) %>% 
-    gather(year, return, `2015`:`2016`, na.rm = TRUE)
-
-stocks %>% 
-  spread(year, return) %>% 
-  gather(year, return, `2015`:`2016`)
-
+  pivot_wider(names_from = year, values_from = return) %>% 
+  pivot_longer(
+    cols = c(`2015`, `2016`), 
+    names_to = "year", 
+    values_to = "return", 
+    values_drop_na = TRUE
+  )
 
 # Az implicit hiányzó adatokat explicitté tehetjük a complete()-tal is:
 
