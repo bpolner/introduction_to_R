@@ -110,7 +110,7 @@ table2
 # - Melyik az az oszlop, ami több változó értékeit is tartalmazza? (value)
 
 table2 %>% 
-  pivot_wider(names_from = type, values_fill = count)
+  pivot_wider(names_from = type, values_from = count)
 
 # pivot_longer: szélesebből hosszabba (wide to long)
 # pivot_wider: hosszabból szélesebbe (long to wide)
