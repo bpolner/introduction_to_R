@@ -1,14 +1,14 @@
 ---
 title: "Felfedező adatelemzés"
 output:
-  html_document:
-    code_download: true
+  html_notebook:
     df_print: paged
     toc: true
     toc_float:
       toc_collapsed: true
-  html_notebook: default
 ---
+
+
 
 [Az R Notebookról bővebben](https://bookdown.org/yihui/rmarkdown/notebook.html)
 
@@ -18,6 +18,7 @@ output:
 ```
 
 Töltsünk be egy pár csomagot!
+
 ```{r}
 library(tidyverse)
 library(plotly)
@@ -29,7 +30,7 @@ library(patchwork)
 ```
 
 
-#Miről szól a felfedező adatelemzés?
+# Miről szól a felfedező adatelemzés?
 
 Az a cél, hogy elkezdjük érteni az adatokat.
 
@@ -47,7 +48,7 @@ Nincsenek szigorúan értelmezett szabályok, két kérdés viszont általában 
 - milyen a változók variabilitása?
 - milyen a változók közös varianciája?
 
-##Változók variabilitásának vizsgálata 
+## Változók variabilitásának vizsgálata 
  
 Eloszlások megjelenítése
  
@@ -55,7 +56,7 @@ Eloszlások megjelenítése
 Kategorikus változók: oszlopdiagram
 ```{r}
 ggplot(data = diamonds) +
-  geom_bar(mapping = aes(x = cut))
+  geom_bar(mapping = aes(x = cut, fill = cut))
 ```
 
 Oszlopok magassága *x* lehetséges értékeinek darabszámát mutatja
@@ -174,13 +175,13 @@ Nézzük meg jobban ezeket a megfigyeléseket!
 Gondoljuk végig alaposan: mi okozhatta ezeket az anomáliákat?
 
 
-###Gyakorlás - eloszlások ábrázolása
+### Gyakorlás - eloszlások ábrázolása
 
 Vizsgáld meg a price változó eloszlását! Észreveszel-e valami furát?
 
 
 
-##Hiányzó értékek 
+## Hiányzó értékek 
 
 Mit tegyünk ezekkel a furcsa gyémántokkal?
 
@@ -236,7 +237,7 @@ Miért nem túl informatív ez az ábra?
 ## Változók közös varianciája 
 
 
-###Kategorikus vs. folytonos
+### Kategorikus vs. folytonos
 
 ```{r}
 ggplot(data = diamonds, mapping = aes(x = price)) + 
@@ -289,10 +290,13 @@ Ha hosszúak a változónevek, forgassunk egyet az ábrán:
 ```{r}
 ggplot(data = mpg) +
   geom_boxplot(mapping = aes(x = reorder(class, hwy, FUN = median), y = hwy)) +
-  coord_flip()
+  coord_flip() + 
+  xlab("Class") + 
+  ylab("Highway miles per gallon") + 
+  ggtitle("Classes of cars ranked by highway mileage")
 ```
 
-####Gyakorlás - kovariancia ábrázolása 1.
+#### Gyakorlás - kovariancia ábrázolása 1.
 
 Hogyan javíthatnánk akkor ezen az ábrán az eddigiek fényében?
 ```{r}
@@ -309,7 +313,8 @@ nycflights13::flights %>%
 ```
 
 
-###Kategorikus vs. kategorikus
+### Kategorikus vs. kategorikus
+
 ```{r}
 ggplot(data = diamonds) +
   geom_count(mapping = aes(x = cut, y = color))
@@ -329,7 +334,7 @@ diamonds %>%
   geom_tile(mapping = aes(fill = n))
 ```
 
-####Gyakorlás - kovariancia ábrázolása 2.
+#### Gyakorlás - kovariancia ábrázolása 2.
 
 
 A dplyr és a geom_tile() felhasználásával nézzük meg, hogyan alakul az átlagos késés
@@ -339,7 +344,7 @@ Miért lehet nehézkes ez az ábra? Mit lehetne kezdeni vele?
 
 
 
-###Folytonos vs. folytonos
+### Folytonos vs. folytonos
 
 ```{r}
 ggplot(data = diamonds) +
@@ -379,15 +384,15 @@ ggplot(data = smaller, mapping = aes(x = carat, y = price)) +
   geom_boxplot(mapping = aes(group = cut_number(carat, 20)))
 ```
 
-####Gyakorlás - kovariancia ábrázolása 3.
+#### Gyakorlás - kovariancia ábrázolása 3.
 
 Ábrázoljuk az eddigiek segítségével a csiszolás, a karát, és az ár kombinált eloszlását!
 
 
 
-#Összetett felfedező elemzések gyorsan
+# Összetett felfedező elemzések gyorsan
 
-##GGally 
+## GGally 
 
 Változók eloszlása és kapcsolata egy nagy ábrán, egyetlen sor kóddal
 ```{r, fig.width=10, fig.height=10, message=FALSE}
@@ -433,14 +438,21 @@ Mindezt ábrázolhatjuk is
 ggcoef(model)
 ```
 
-##corrplot
+## corrplot
 
 
 Korrelációs mátrixok ábrázolása
+
 ```{r}
-mtcars %>% 
-  select(mpg, disp, hp, wt) %>% 
-  cor() %>% # korrelációs mátrix
+(corr_mat_cars <- 
+   mtcars %>% 
+   select(mpg, disp, hp, wt) %>% 
+   cor())
+```
+
+
+```{r}
+corr_mat_cars %>% 
   corrplot()
 ```
 
@@ -448,11 +460,9 @@ mtcars %>%
 p_mat <- 
   mtcars %>% 
   select(mpg, disp, hp, wt, qsec) %>% 
-  cor.mtest() %>% .[["p"]] # kinyerjük a korrelációkhoz tartozó 
+  cor.mtest() %>% .[["p"]] # kinyerjük a korrelációkhoz tartozó p-értékeket
 
-mtcars %>% 
-  select(mpg, disp, hp, wt, qsec) %>% 
-  cor() %>% # korrelációs mátrix
+corr_mat_cars %>% 
   corrplot(p.mat       = p_mat, 
            method      = "square", 
            addCoef.col = "lightgrey", 
@@ -496,11 +506,15 @@ grid.arrange(p1, p2, p3, nrow = 1)
 ```
 
 Ábrák elrendezésének finomhangolása a layout_matrix argumentummal
+
 ```{r, fig.width=15}
-grid.arrange(p1, p2, p3, 
-             layout_matrix = rbind(c(1, 2, 2),
-                                   c(3, 2, 2))
-             )
+grid.arrange(
+  p1, p2, p3, 
+  layout_matrix = 
+    rbind(
+      c(1, 2, 2),
+      c(3, 2, 2))
+)
 ```
 
 [További lehetőségek több panelből álló ábrák szerkesztésére](https://cran.r-project.org/web/packages/egg/vignettes/Ecosystem.html)
@@ -512,11 +526,12 @@ p1 + p2 + p3 + plot_layout(ncol = 2)
 ```
 
 
-#Interaktív ábrák a plotly-vel
+# Interaktív ábrák a plotly-vel
 
-[Bevezetés a plotly használatába](https://plotly-book.cpsievert.me/)
+[Bevezetés a plotly használatába](https://plotly-r.com/)
 
 Nézzünk meg elsőnek egy vulkánt!
+
 ```{r}
 plot_ly(z = ~volcano)
 ```
@@ -528,6 +543,7 @@ plot_ly(z = ~volcano) %>% add_surface()
 
 
 Texas-i ingatlanpiaci adatok
+
 ```{r}
 txhousing
 ```
@@ -540,7 +556,7 @@ Két út a plotly objektumok létrehozására:
 2) plot_ly(): közvetlenül az adatok megadása
 
 
-##ggplotly(): egy ggplot objektum átalákítása
+## ggplotly(): egy ggplot objektum átalákítása
 
 Készítsünk egy ggplot2 ábrát, ahol az idő függvényében mutatjuk a városonkénti medián eladási árat!
 ```{r}
@@ -557,7 +573,7 @@ Felül is írhatjuk, hogy mit kapjon meg a tooltip
 ggplotly(p, tooltip = "city")
 ```
 
-##plot_ly(): közvetlenül az adatok megadása
+## plot_ly(): közvetlenül az adatok megadása
 
 Adatok manipulálásra a dplyr és a tidyr függvényeit használhatjuk
 Pl. a csoportosított adatokat "érti" a plotly 
