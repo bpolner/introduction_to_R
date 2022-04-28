@@ -325,11 +325,6 @@ str_view(fruit, "(..)\\1", match = TRUE)
 # + = Egyszer vagy többször ismétlődik a megelőző elem
 # * = Egyszer sem vagy többször ismétlődik a megelőző elem
 
-str_view("aaabbcddEEEE", "E?")
-
-str_view("aaabbcddEEEE", "E+")
-
-str_view("aaabbcddEEEE", "E*")
 
 # 2) Mit keresnek ezek a regex-ek? Írjuk le szavakkal!
 # (néhol a regex, máshol a regex-et megadó string látható!)
