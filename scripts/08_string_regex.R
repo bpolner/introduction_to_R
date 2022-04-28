@@ -402,6 +402,8 @@ df <- tibble(
 df %>% 
   filter(str_detect(words, "x$"))
 
+# Így lehet szűrni pl. vizsgálati résztvevők azonosítója mentén, ha azokban van rendszer!
+
 # Hány darab egyezés van egy string-en belül? str_count()
 
 x <- c("apple", "banana", "pear")
