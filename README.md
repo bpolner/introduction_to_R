@@ -1,10 +1,14 @@
-# A *Bevezetés az R programozásba* kurzus anyagai / Course material for the *Introduction to R Programming* course (HU) 
+# A *Bevezetés az R programozásba* kurzus anyagai / Course material for the *Introduction to R Programming* course (HU)
 
 BME TTK Kognitív Tudományi Tanszék
 
 2021-2022. tavaszi félév
 
 [Tematika / Syllabus (HU)](https://docs.google.com/document/d/1zeECbntXZ6_5nr9hHKTEDkm_gqhakV2TBGl8Mx0Kp1A/edit?usp=sharing)
+
+A tananyag jelentős részben az alábbi könyvön alapul:   
+[R for Data Science](https://r4ds.had.co.nz/)   
+Az egyik legjobb könyv R és úgy általában data science tanuláshoz, forgassátok!
 
 A kurzust idén is támogatja a [DataCamp](https://www.datacamp.com/)! Használjátok, remek lehetőség a data science készségek fejlesztésére!
 
