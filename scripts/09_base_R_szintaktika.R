@@ -1,4 +1,4 @@
-#### A base R alapvet? szintaktik?ja --------------------------------
+#### A base R alapvető szintaktikája --------------------------------
 
 ## Az R, mint szamologep ----------------
 
