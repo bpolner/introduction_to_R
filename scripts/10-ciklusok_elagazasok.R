@@ -43,7 +43,7 @@ print("A szam kisebb szaznal")
 #       csináld-ezt-meg-azt-ha-<<állítás>>-igaz
 #     }
 
-# Mit lesz az eredménye a végrehajtásnak?
+# Mi lesz az eredménye a végrehajtásnak?
 
 
 x <- 99
@@ -179,6 +179,10 @@ if (x < 2) {
 # Tipp: Figyelni kell a típusok sorrendjére, mert némelyik nagyobb halmaz, mint a másik!
 # Próbáljuk ki különböző típusú változókkal!
 
+
+valami <- list(TRUE, NA)
+
+
 # 4 Ciklusok ----------
 
 # 4.1 A while ciklus ----------
@@ -290,7 +294,7 @@ print(v1)
 
 # Rövidebb megoldás:
 v1 <- c(v1,'f')
-v
+v1
 
 # 4.1.2.2 Vektor elemeinek száma és indexelés ----------
 
@@ -391,12 +395,20 @@ for (i in seq(0,10,2)) {
 # Csináljuk meg a korábbi, hatványos példát a for ciklus és a tartományok/seq parancs kombinálásával!
 
 
+# Készítsünk v3 néven olyan vektort, aminek 
+# az első eleme a v2 vektor első elemének az egyszerese, 
+# a második a v2 második elemének a kétszerese, 
+# a harmadik a v2 harmadik elemének háromszorosa, stb, 
+# az n-edik elem a v2 n-edik elemének n-szerese.
 v2 <- c(3, 7, 4, 2, 123, 5678, 134, 23, 57, 23324)
-# Készítsünk v3 néven olyan vektort, aminek az első eleme a v2 vektor első elemének az egyszerese, a második a v2 második elemének a kétszerese, a harmadik a v2 harmadik elemének háromszorosa, stb, az n-edik elem a v2 n-edik elemének n-szerese.
 
 # Íjrunk egy olyan parancsot, ami megkeresi az x-nél kisebb összes prímszámot!
 
 # x <- 5000
+
+# Csak önmagával és 1-gyel osztható - más számokkal nem osztható
+
+
 
 # 5 Gyakorlati alkalmazás ----------
 
