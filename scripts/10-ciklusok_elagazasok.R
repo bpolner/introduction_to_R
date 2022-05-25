@@ -1,3 +1,6 @@
+# A kódot Markója Ádám írta, amikor doktoranduszként a BME Kognitív Tudományi Tanszékén részt vett a kurzus oktatásában.
+# Nagyon köszönjük, Ádám!
+
 # 0.1 Libraryk behívása ----------
 require(stringr)
 require(dplyr)
