@@ -2,6 +2,8 @@
 
 ELTE PPK 
 
+[Tematika/Syllabus in HU](https://docs.google.com/document/d/19YvcWRp3f70eHEL4CsXWEpv9BtjEDkVQ71AMS-Ml90E/edit#)
+
 2022-2023. őszi félév
 
 A tananyag jelentős részben az alábbi könyvön alapul:   
