@@ -158,7 +158,7 @@ ggplot(data = mpg) +
 
 # Nézzük meg, melyik displ+hwy kombinációban van több átfedő adatpont
 ggplot(data = mpg) +
-  geom_count(mapping = aes(x = displ, y = hwy), alpha = 0.5)
+  geom_point(mapping = aes(x = displ, y = hwy), alpha = 0.5)
 
 
 
@@ -220,7 +220,7 @@ bar + coord_polar()
 ggplot(data = mpg, mapping = aes(x = cty, y = hwy)) +
   geom_point() + 
   geom_abline() +
-  coord_fixed()
+  coord_fixed(xlim = c(5, 45), ylim = c(5, 45))
 
 #### 9. Osszefoglalas: a grafika nyelvtana a ggplot2-ben  -------------------------------- 
 
