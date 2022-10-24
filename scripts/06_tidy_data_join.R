@@ -127,7 +127,7 @@ preg <- tribble(
 )
 
 
-# 2) Miért nem tökéletesen szimmetrikus a gather és a spread? 
+# 2) Miért nem tökéletesen szimmetrikus a pivot_wider és a pivot_longer? 
 
 stocks <- tibble(
   year   = c(2015, 2015, 2016, 2016),
