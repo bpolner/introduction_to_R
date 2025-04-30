@@ -1,0 +1,209 @@
+---
+title: "Project title - exploratory data analysis"
+author: 
+  - Template by Bertalan Polner^[Donders Institute for Brain, Cognition and Behaviour, Radboud University, Nijmegen, The Netherlands]
+  - You can add more authors^[and their affiliations]
+date: "Last compiled on `r format(Sys.time(), '%d/%m/%Y, %X %Z')`"
+output: 
+  html_notebook:
+    toc: true
+    toc_float: true
+    toc_depth: 5
+    code_folding: hide
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+
+This is a ***general*** template for tidying data and Exploratory Data.
+Analysis (EDA), using mostly the tidyverse.
+
+A very helpful introduction to EDA with tidyverse:
+<https://r4ds.hadley.nz/eda>
+
+# Setup
+
+## Load libraries
+
+It is good practice to load all libraries at the beginning of your
+notebook.
+
+```{r }
+library(tidyverse) # very useful for importing, tidying, aggregating, and visualising data
+```
+
+## Global options for knitr
+
+> To set global options that apply to every chunk in your file, call
+> knitr::opts_chunk\$set in a code chunk. Knitr will treat each option
+> that you pass to knitr::opts_chunk\$set as a global default that can
+> be overwritten in individual chunk headers.
+>
+> Source: <https://rmarkdown.rstudio.com/lesson-3.html>
+
+## Specify themes
+
+You can use ggplot2::theme_set()
+<https://ggplot2.tidyverse.org/reference/theme_get.html>
+
+## Session info (to support reproducibility)
+
+```{r}
+sessionInfo()
+```
+
+# Import
+
+-   A useful way to import multiple raw datafiles with identical format
+    and merge them into a single dataframe
+    -   Get all the relative file paths with list.files() - either have
+        only the relevant files in a separate folder or specify a regex
+        in the patter argument
+    -   Import them with a proper file import function (usually
+        read_csv).
+    -   You may also specify import arguments and pass them to map_dfr
+        or write your own import function for complex use cases
+    -   Wrap the import within map_dfr: voila, you have all the raw data
+        in a single dataframe!
+
+```{r}
+file_paths <- list.files("directory with raw data files here", full.names = TRUE)
+dat        <- map_dfr(file_paths, read_csv) 
+```
+
+# Tidy
+
+## Clean
+
+Iterate between initial formal quality control and removing rows/columns
+if necessary
+
+### Initial formal quality control
+
+Do some sanity checks:
+
+-   right number of individuals (or sites, etc)?
+-   right number of observations per individuals?
+-   right number of columns?
+
+```{r}
+table(mtcars$mpg)
+```
+```{r}
+summary(mtcars)
+```
+
+
+### Rows
+
+Never change the raw data!
+
+Are there unnecessary rows in your dataframe?
+
+Try to formalize a rule that applies to them and use dplyr::filter to
+get rid of them.
+
+Avoid indexing by row number as that is not stable.
+
+### Columns
+
+Also, are there unnecessary columns in there?
+
+There might be redundant columns automatically added by default during
+data collection.
+
+Refer to columns by name and not by position (again, that might become
+unstable). Or use dplyr::select to select the columns you need and get rid of the rest. 
+
+## Prepare
+
+### Variable names
+
+Are columns names intuitive and simple? If not, rename.
+
+Avoid var2.rt or thisResponse.RT
+
+Prefer reaction_time or rt (use abbreviations only when they are very
+trivial!)
+
+Are column names spelled consistently?
+
+Sticking to a consistent style will save you mental capacity.
+
+Hint: janitor package, tolower(), toupper(), etc.
+<https://cran.r-project.org/web/packages/janitor/vignettes/janitor.html>
+
+### Compute, recode, convert variables
+
+You might realise that some variables can be represented in a better way
+than done in the raw files. E.g. recode dummy variables to 0/1, or
+convert categorical variables into factors. 
+
+You may also want to calculate some variables that you will explore
+later. It might make sense to do all those calculations at this point,
+so they're available at all subsequent data exploration steps.
+
+# Explore
+
+> Your goal during EDA is to develop an understanding of your data. The
+> easiest way to do this is to use questions as tools to guide your
+> investigation. When you ask a question, the question focuses your
+> attention on a specific part of your dataset and helps you decide
+> which graphs, models, or transformations to make.
+>
+> EDA is fundamentally a creative process. And like most creative
+> processes, the key to asking *quality* questions is to generate a
+> large *quantity* of questions. It is difficult to ask revealing
+> questions at the start of your analysis because you do not know what
+> insights can be gleaned from your dataset. On the other hand, each new
+> question that you ask will expose you to a new aspect of your data and
+> increase your chance of making a discovery. You can quickly drill down
+> into the most interesting parts of your data---and develop a set of
+> thought-provoking questions---if you follow up each question with a
+> new question based on what you find.
+>
+> There is no rule about which questions you should ask to guide your
+> research. However, two types of questions will always be useful for
+> making discoveries within your data. You can loosely word these
+> questions as:
+>
+> 1.  What type of variation occurs within my variables?
+>
+> 2.  What type of covariation occurs between my variables?
+>
+> Source: <https://r4ds.hadley.nz/eda#questions>
+
+It is good practice to look at aggregated and individual-level data as
+well, to get a sense of both overall trends and individual variation.
+Hints for the latter:
+
+-   plotting: add a facet_wrap(\~participant) layer to plots
+-   sumamry tables: add a group_by(participant) operation before summary
+    stats
+
+## Missing values
+
+add naniar package
+
+## Variation
+
+Some general questions to get started:
+
+-   are values within a reasonable range? Sanity check
+-   is there enough variation?
+-   what is the shape of the distribution?
+-   what are the typical values?
+-   are there unusual values? Outliers?
+-   is there a pattern in which values are absent from the data?
+
+## Covaration
+
+Some general questions to get started:
+
+-   do you see expected / trivial associations? Sanity check, again
+-   do you see unexpected associations?
+-   do you see clusters in the data?
+-   multivariate outliers? I.e. value is typical on all variables but
+    still the combination is unusual?
+-   change across time is a special case of covariation. Explore
+    temporal trends!
