@@ -394,7 +394,7 @@ charToRaw("Hadley")
 
 # ASCII kódolás az angol nyelvre jó
 # Egyéb nyelvek: 
-#   Latin1 / ISO-8859-2 Ny-Eu nyelvek 
+#   Latin1 / ISO-8859-1 Ny-Eu nyelvek 
 #   Latin2 / ISO-8859-2- K-Eu nyelvek
 # 
 # Nagyon elterjedt és szinte mindent kódol: UTF-8
