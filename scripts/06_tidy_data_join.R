@@ -3,142 +3,141 @@
 library(tidyverse)
 
 
-# 1. Adatrendezes (tidy data) ---------------------------------------------
+# 1. Tidy data -------------------------------------------------------------
 
-# Ugyanaz az adat tobbfelekeppen is tárolható
+# The same data can be stored in multiple ways
 
 table1
 table2
 table3
 table4a; table4b
 
-# Mitol lesz rendezett (tidy) az adat?
-# 1. Minden valtozo kulon oszlop
-# 2. Minden megfigyeles kulon sor
-# 3. Minden ertek kulon cella
+# What makes data tidy?
+# 1. Each variable is a separate column
+# 2. Each observation is a separate row
+# 3. Each value is a separate cell
 
-# Praktikusan: 
-# 1. Minden adathalmaz egy tibble-ben legyen
-# 2. Minden változó egy oszlopban legyen
+# Practically: 
+# 1. Each dataset should be in one tibble
+# 2. Each variable should be in one column
 
-# A fenti 4 pelda kozul melyik tekintheto tidy-nak (rendezettnek)?
+# Of the four examples above, which can be considered tidy?
 
-# Miért jó ez nekünk?
+# Why is this useful?
 
-# - Konzisztensen rendezett adatok segitik altalanos elvek alkalmazasat,
-# amikor az adatokkal dolgozunk
-# - A tidyverse csomagjai feltetelezik az adatok rendezettseget
+# - Consistently tidy data helps apply general principles
+#   when working with data
+# - Tidyverse packages assume tidy data
 
-# Pl. 10 000 fore eso gyakorisagi arany
-table1 %>% 
-    mutate(rate = cases / population * 10000)
+# E.g., cases per 10,000 people
+table1 %>%
+  mutate(rate = cases / population * 10000)
 
-# Vagy az evenkenti esetek szama
-table1 %>% 
-    count(year, wt = cases)
+# Or number of cases by year
+table1 %>%
+  count(year, wt = cases)
 
-# Valtozas egy ev alatt
+# Change over one year
 ggplot(table1, aes(year, cases)) + 
-    geom_line(aes(group = country), colour = "grey50") + 
-    geom_point(aes(colour = country))
+  geom_line(aes(group = country), colour = "grey50") + 
+  geom_point(aes(colour = country))
 
-# Hogyan készítenétek el ugyanezeket a kimutatásokat és
-# az ábrát table2, ill. table4a és table4b alapján?
-
-
-# 1.1 Szetterites es osszegyujtes -------------------------------------------
-
-# Az adatok sajnos a legtöbbször nincsenek tidy formátumba rendezve.
-# Miért?
-# Sokan nem ismerik, és nem evidens
-# Az adatok rendezése sokszor nem az elemzést, hanem a bevitelt segíti
+# How would you produce the same summaries and
+# the same plot using table2 and table4a/4b?
 
 
-# Hogyan tudjuk tidy formátumba rendezni az adatokat?
+# 1.1 Spreading and gathering -------------------------------------------
 
-# 1. lépés: Mik a változók és a megfigyelések?
+# Unfortunately data is often not stored in tidy format.
+# Why?
+# Many people don’t know about tidy data, and it’s not obvious
+# Data structure often helps data entry, not analysis
 
-# 2. lépés: Két probléma lehet:
-# - egy változóhoz tartozó adatok több oszlopban lehetnek
-# - egy megfigyelés több sorba is szét lehet szóródva
-# Általában egyszerre csak az egyik áll fenn.
 
-# Ezeket a problémákat orvosolja a tidyr két alapvető függvénye:
-# pivot_longer() és pivot_wider()
-  
-# pivot_longer (=átalakítás hosszabb formátumba): 
-# ha az oszlopnevek egy változó értékeit veszik fel
+# How do we convert data to tidy format?
+
+# Step 1: Identify variables and observations
+
+# Step 2: Two main issues:
+# - data belonging to one variable may appear in several columns
+# - one observation may be spread across multiple rows
+# Usually only one of these is present at a time.
+
+# These problems are solved by tidyr’s two core functions:
+# pivot_longer() and pivot_wider()
+
+# pivot_longer (making data longer): 
+# when column names encode values of a variable
 
 table4a
 
-# Három fontos paraméter:
+# Three important arguments:
 
-# - Melyek az oszlopok, amikben nem változók, hanem értékek vannak?
-# - Mi az a változó, aminek az értékeit a változónevek ebben a táblában? (key)
-# - Mi az a változó, aminek az értékei a cellákban vannak? (value)
+# - Which columns contain values, not variables?
+# - What is the variable whose values are encoded in the column names? (names_to)
+# - What is the variable whose values are stored in the cells? (values_to)
 
-table4a %>% 
-    pivot_longer(c(`1999`, `2000`), names_to = "year", values_to = "cases")
-
-# Az oszlopokat úgy jelöljük ki, mint a dplyr::select()-nél.
-
-
-# Hasonloan eljarhatunk a table4b eseteben is, csak itt ugye
-# egy másik változó értékei vannak a cellákban, módosítsuk a value paramétert!
-
-table4b %>% 
-    pivot_longer(c(`1999`, `2000`), names_to = "year", values_to = "population")
-
-# Ahhoz, hogy egy tibble-be kerüljenek az adataink, hasznaljuk a left_join()-t
-
-tidy4a <- table4a %>% 
+table4a %>%
   pivot_longer(c(`1999`, `2000`), names_to = "year", values_to = "cases")
-tidy4b <- table4b %>% 
+
+# Columns are selected like in dplyr::select().
+
+
+# Similarly for table4b, but now the cell values represent a different variable
+
+table4b %>%
+  pivot_longer(c(`1999`, `2000`), names_to = "year", values_to = "population")
+
+# To combine the datasets into one tibble, use left_join()
+
+tidy4a <- table4a %>%
+  pivot_longer(c(`1999`, `2000`), names_to = "year", values_to = "cases")
+tidy4b <- table4b %>%
   pivot_longer(c(`1999`, `2000`), names_to = "year", values_to = "population")
 left_join(tidy4a, tidy4b)
 
 
-# Kicsit később lesz szó a join függvényekről is!
+# We will discuss joins later!
 
-# pivot_wider (=átalakítás szélesebb formátumra): 
-# ha van egy oszlop, amiben változók nevei szerepelnek
+# pivot_wider (making data wider): 
+# when a column contains variable names
 
 table2
 
-# Most két dolog fontos:
-# - Melyik az az oszlop, amelyik a változók neveit tartalmazza? (key)
-# - Melyik az az oszlop, ami több változó értékeit is tartalmazza? (value)
+# Now two things matter:
+# - Which column contains variable names? (names_from)
+# - Which column contains the values? (values_from)
 
-table2 %>% 
+table2 %>%
   pivot_wider(names_from = type, values_from = count)
 
-# pivot_longer: szélesebből hosszabba (wide to long)
-# pivot_wider: hosszabból szélesebbe (long to wide)
+# pivot_longer: wide → long
+# pivot_wider: long → wide
 
 
-# 1.1.1 Gyakorlas - pivot_longer és pivot_wider  --------------------------------------
+# 1.1.1 Practice - pivot_longer and pivot_wider  --------------------------------------
 
-# 1) Rendezd a preg adatokat tidy formátumba!
+# 1) Make the preg data tidy!
 
 preg <- tribble(
-    ~pregnant, ~male, ~female,
-    "yes",     NA,    10,
-    "no",      20,    12
+  ~pregnant, ~male, ~female,
+  "yes",     NA,    10,
+  "no",      20,    12
 )
 
 
-# 2) Miért nem tökéletesen szimmetrikus a pivot_wider és a pivot_longer? 
+# 2) Why are pivot_wider and pivot_longer not perfectly symmetric? 
 
 stocks <- tibble(
   year   = c(2015, 2015, 2016, 2016),
   half  = c(   1,    2,     1,    2),
   return = c(1.88, 0.59, 0.92, 0.17)
 )
-stocks %>% 
-  pivot_wider(names_from = year, values_from = return) %>% 
+stocks %>%
+  pivot_wider(names_from = year, values_from = return) %>%
   pivot_longer(`2015`:`2016`, names_to = "year", values_to = "return")
 
-# 3) Miért nem lehet szétteríteni ezt a táblát? Mit kellene tenni, hogy lehessen
+# 3) Why can’t this table be spread? What would you need to do to fix it?
 
 people <- tribble(
   ~name,             ~key,    ~value, 
@@ -151,75 +150,72 @@ people <- tribble(
 )
 
 
-# 1.2 Elválasztás es egyesítés --------------------------------------------
+# 1.2 Separation and uniting --------------------------------------------
 
-# Előfordulhat az is, hogy egy oszlopban több változó értéke is szerepel!
+# A column may contain values from more than one variable!
 
 table3
 
-# Ilyenkor jön jól a separate()
+# This is what separate() is for:
+
+table3 %>%
+  separate(rate, into = c("cases", "population"))
+
+# separate() detects non‑alphanumeric characters as separators.
+# You can also specify the separator:
 
 table3 %>% 
-    separate(rate, into = c("cases", "population"))
+  separate(rate, into = c("cases", "population"), sep = "/")
 
-# A separate() elvalasztokent azonosítja a nem-alfanumerikus karaktereket.
-# Az elválasztót meg is adhatjuk:
+# Oops! Numbers became character
+# - because they were character in the original,
+# and separate() does not change column type by default
+# convert=TRUE: attempts to convert to a better type after splitting
 
-table3 %>% 
-    separate(rate, into = c("cases", "population"), sep = "/")
-
-# Hoppa! A szamok karakterkent kepezodtek le 
-# - mert ugye karakterkent voltak a forrasban, és alapesetben
-# a separate() nem változtatja meg az oszlopok típusát
-# convert=TRUE: megprobalja jobb adattipusra alakitani 
-# az oszlopot az elvalasztas utan
-
-table3 %>% 
+table3 %>%
     separate(rate, into = c("cases", "population"), convert = TRUE)
 
-# sep argumentumnak egész számokkal azt is megadhatjuk, hogy
-# hány karakterenként vágjon:
+# sep can also take integers specifying positions:
 
-table3 %>% 
+table3 %>%
     separate(year, into = c("century", "year"), sep = 2)
 
-# Ez itt most nem túl hasznos, de van, amikor jól jöhet!
+# Not very useful here, but sometimes handy!
 
-# unite() (=egyesítés): több oszlopból egy értéket
+# unite(): combine multiple columns into one
 
 table5
 
-table5 %>% 
+table5 %>%
   unite(new, century, year)
 
-# Alapértelmezett szeparátor: _ 
-# Ha nem szeretnénk szeparátort:
+# Default separator: _
+# If you don’t want a separator:
 
-table5 %>% 
+table5 %>%
     unite(new, century, year, sep="")
 
 
+# 1.2.1 Practice - separate and unite ------------------------------
 
-# 1.2.1 Gyakorlás - elválasztás és egyesítés ------------------------------
+# 1) What do the extra and fill arguments of separate() do?
 
-# 1) Mit tud a separate() extra és fill argumentuma?
-
-tibble(x = c("a,b,c", "d,e,f,g", "h,i,j")) %>% 
+tibble(x = c("a,b,c", "d,e,f,g", "h,i,j")) %>%
   separate(x, c("one", "two", "three"))
 
 
-tibble(x = c("a,b,c", "d,e", "f,g,i")) %>% 
+tibble(x = c("a,b,c", "d,e", "f,g,i")) %>%
   separate(x, c("one", "two", "three"))
 
 
 
-# 1.3 Hiányzó adatok  -----------------------------------------------------
+#  -----------------------------------------------------
 
-# Hiányzó adatok kétféleképpen lehetnek jelen az adattáblában:
-# - Explicit: NA-val jelölve (a hiány jelenléte)
-# - Implicit: egyszerűen csak nincs meg az adat (a jelenlét hiánya)
+# Missing data can appear in two ways:
+# - Explicit: marked with NA (presence of missingness)
+# - Implicit: simply not present in the data (absence of presence)
 
-# A lenti peldaban hol vannak ilyenek?
+# Where are these in the example?
 
 stocks <- tibble(
     year   = c(2015, 2015, 2015, 2015, 2016, 2016, 2016),
@@ -227,15 +223,15 @@ stocks <- tibble(
     return = c(1.88, 0.59, 0.35,   NA, 0.92, 0.17, 2.66)
 )
 
-# Másfajta elrendezés explicitté teheti az összes hiányzó adatot
+# A different arrangement can make all missing values explicit
 
-stocks %>% 
+stocks %>%
     pivot_wider(names_from = year, values_from = return)
 
-# Ha a hianyzo adatok explicit megjelenitese nem erdekes, implicitte tehetjuk
+# If explicit missing values are not interesting, we can make them implicit
 
-stocks %>% 
-  pivot_wider(names_from = year, values_from = return) %>% 
+stocks %>%
+  pivot_wider(names_from = year, values_from = return) %>%
   pivot_longer(
     cols = c(`2015`, `2016`), 
     names_to = "year", 
@@ -243,14 +239,13 @@ stocks %>%
     values_drop_na = TRUE
   )
 
-# Az implicit hiányzó adatokat explicitté tehetjük a complete()-tal is:
+# We can make implicit missing data explicit using complete()
 
-stocks %>% 
+stocks %>%
     complete(year, qtr)
 
-# Meg egy fontos dolog: 
-# hianyzo adatok "macskakormozest" is jelenthetnek 
-# (adatbeviteli gyakorlat)
+# One more important thing:
+# “Missing data” may also be “forgotten data entry”
 
 treatment <- tribble(
     ~ person,           ~ treatment, ~response,
@@ -260,81 +255,80 @@ treatment <- tribble(
     "Katherine Burke",  1,           4
 )
 
-# Ilyenkor használjuk a fill()-t!
+# In such cases use fill()!
 
-treatment %>% 
+treatment %>%
     fill(person)
 
-# Fentről lefelé haladva a megadott oszlopban a hiányzó értékeket
-# a legutolsó nem hiányzó értékkel helyettesíti be
-# ("last observation carried forward" módszer)
+# It fills missing values going downward using the last non‑missing value
+# ("last observation carried forward")
 
-# fill() .direction argumentuma:
+# fill() .direction argument:
 
-treatment %>% 
+treatment %>%
   fill(person, .direction = "up")
 
 
-# Még a tidy formátumról: www.jstatsoft.org/v59/i10/paper 
-# A nem-tidy formátumokról: https://simplystatistics.org/2016/02/17/non-tidy-data/ 
+# More about tidy data: www.jstatsoft.org/v59/i10/paper 
+# About non‑tidy formats: https://simplystatistics.org/2016/02/17/non-tidy-data/ 
 
 
-# 2. Adattablak kapcsolasa ------------------------------------------------
+# 2. Joining data tables ------------------------------------------------
 
 library(nycflights13)
 
-# Az adataink gyakran több adattáblában vannak.
-# Pl. jegyzőkonyv + kísérleti eredmények + kérdőívek. 
+# Our data often lives in multiple tables.
+# Example: logs + experiment results + questionnaires. 
 
-# nycflights13 csomagban több tibble is van:
+# nycflights13 contains several tibbles:
 airlines
 airports
 planes
 weather
 
-# Hogyan kapcsolódnak egymáshoz ezek a táblák?
+# How are these tables related?
 # http://r4ds.had.co.nz/diagrams/relational-nycflights.png
 
-# Az adattablakat "kulcsok" (keys) segitsegevel köthetjük össze
-# Kulcs: olyan változó (vagy változóhalmaz), 
-# ami egy megfigyelés azonosítására alkalmas
+# Tables are connected using “keys”
+# Key: a variable (or set of variables)
+# that uniquely identifies an observation
 # 
-# Elsodleges (primary) kulcsok: 
-#   egyertelmuen azonositanak egy megfigyelest adott tablan belul
-#   pl. planes$tailnum
-# Idegen (foreign) kulcsok: 
-#   egyertelmuen azonositanak egy megfigyelest egy masik tablan 
-#   pl. flights$tailnum 
+# Primary key: 
+#   uniquely identifies an observation within a table
+#   e.g., planes$tailnum
+# Foreign key: 
+#   uniquely identifies an observation in another table
+#   e.g., flights$tailnum 
 # 
-# Egy valtozo lehet egyszerre mindketto is!
+# A variable may be both!
 # 
-# Egy elsődleges kulcs és egy másik tábla idegen kulcsa 
-# együttesen alkotnak egy kapcsolatot
+# A primary key together with a foreign key 
+# define a relationship.
 
-# Ha azonositottunk egy elsodleges kulcsot, 
-# erdemes ellenorizni, hogy tenyleg egyedi-e.
-# Nem tartozik-e veletlenul tobb megfigyeleshez is?
+# If we identify a primary key,
+# we should check if it is truly unique.
+# Does it accidentally refer to multiple observations?
 
-planes %>% 
-    count(tailnum) %>% 
+planes %>%
+    count(tailnum) %>%
     filter(n > 1)
 
-weather %>% 
-    count(year, month, day, hour, origin) %>% 
+weather %>%
+    count(year, month, day, hour, origin) %>%
     filter(n > 1)
 
-# Előfordulhat, hogy egy táblában nincs elsődleges kulcs!
-# A járatszám / gép sorszáma + dátum elsődleges kulcs a flights táblában? 
+# Sometimes a table has no primary key at all!
+# Is flight number / plane ID + date a primary key in flights? 
 
 
 
 
 
 
-# Ilyenkor célszerű létrehozni minden megfigyelésnek egy sorszámot 
-# (mesterséges/helyettesítő kulcs  = surrogate key)
+# In such cases it’s good practice to add a row number 
+# (surrogate key)
 
-stocks %>% 
+stocks %>%
   mutate(
     rownumm = row_number()
   )
@@ -342,110 +336,108 @@ stocks %>%
 
 # 2.1 Mutating joins -------------------------------------------------------
 
-# Egyezteti a megfigyeleseket a kulcsok alapjan, aztan 
-# egyik táblából a másikba masol valtozokat
+# Matches observations based on keys, then 
+# copies variables from one table to the other
 
-# Hasznaljunk egy keskenyebb tablat, 
-# hogy jol lassuk a kapcsolasok eredmenyet:
+# Use a narrower table for clarity:
 
-flights2 <- flights %>% 
+flights2 <- flights %>%
     select(year:day, hour, origin, dest, tailnum, carrier)
 
 flights2
 
-# Pl. légitársaság teljes nevét (airlines tábla) 
-# adjuk hozzá a flights2 táblához:
+# Example: add airline full name (from airlines table) 
+# to the flights2 table:
 
 flights2 %>%
-    select(-origin, -dest) %>% 
+    select(-origin, -dest) %>%
     left_join(airlines, by = "carrier")
 
-# Ugyanezt megoldhattuk volna a mutate használatával is,
-# igaz, kevésbé átlátható, és több változóval sokkal bonyolultabb lenne
+# We could do the same with mutate,
+# but it’s less clear and more complicated with many variables
 
 flights2 %>%
-  select(-origin, -dest) %>% 
+  select(-origin, -dest) %>%
   mutate(name = airlines$name[match(carrier, airlines$carrier)])
 
-# A kapcsolások alapjait ezeken az egyszerű táblákon fogjuk szemlélteni:
+# We demonstrate join basics on simple example tables:
 
 x <- tribble(
-    ~nev, ~kor,
+    ~name, ~age,
     "Anna", "20",
     "Béla", "30",
     "Csaba", "40"
 )
 
 y <- tribble(
-    ~nev, ~macska,
+    ~name, ~has_cats,
     "Anna", 0,
     "Béla", 4,
     "Dávid", 1
 )
 
 z <- tribble(
-    ~nev, ~kedvenc_szine,
-    "Anna", "kék",
-    "Béla", "piros",
-    "Zsuzsi", "szürke"
+    ~name, ~favourite_colour,
+    "Anna", "blue",
+    "Béla", "red",
+    "Zsuzsi", "gray"
 )
 
 # Inner join
-# Csak a mindkét táblában meglévő megfigyeléseket tartja meg
+# Keeps only matching observations in both tables
 
-x %>% 
-    inner_join(y, by = "nev")
+x %>%
+    inner_join(y, by = "name")
 
 # Outer join
-# Akkor tart meg egy megfigyelést, 
-# ha az legalább az egyik táblában előfordult
+# Keeps an observation if it appears in at least one table
 # http://r4ds.had.co.nz/diagrams/join-outer.png 
 
-# left_join(): az összes bal oldali táblában meglévő megfigyelést megtartja
+# left_join(): retains all rows from the left table
 
-x %>% 
-    left_join(y,  by = "nev") 
+x %>%
+    left_join(y,  by = "name") 
 
-# right_join(): a jobb oldali táblából tartja meg az összes megfigyelést
+# right_join(): retains all rows from the right table
 
-x %>% 
-    right_join(y, by = "nev") 
+x %>%
+    right_join(y, by = "name") 
 
-# full_join(): mindkét tábla összes megfigyelését megtartja
+# full_join(): retains all rows from both tables
 
-x %>% 
-    full_join(y, by = "nev")
+x %>%
+    full_join(y, by = "name")
 
-# join-ok Venn-diagramon: http://r4ds.had.co.nz/diagrams/join-venn.png 
+# Venn diagram of join types: http://r4ds.had.co.nz/diagrams/join-venn.png 
 
-# Mi történik, ha a kulcsok nem azonosítanak egyértelműen egy megfigyelést?
+# What happens if keys do not uniquely identify observations?
 
-# A) Egyik tablaban duplikalt, masikban egyedi
-# pl. ha egy külön táblában tárolunk extra információt
-# egy-kapcsolódik-sokhoz (pl. járatok-repterek)
+# A) Duplicated in one table, unique in the other
+# e.g., storing extra info in a separate table
+# one-to-many relationship (flights–airports)
 
 x <- tribble(
-    ~nev, ~mai_ebed,
-    "Anna", "rakott krumpli",
-    "Béla", "tökfőzelék",
-    "Béla", "pörkölt",
-    "Anna", "szendvics"
+    ~name, ~lunch_today,
+    "Anna", "potatoes",
+    "Béla", "pumpkins",
+    "Béla", "goulash",
+    "Anna", "sandwich"
 )
 
 y <- tribble(
-    ~nev, ~uni,
+    ~name, ~uni,
     "Anna", "BME",
     "Béla", "ELTE"
 )
 
-left_join(x, y, by = "nev")
+left_join(x, y, by = "name")
 
-# B) Mindket tablaban duplan van egy kulcs: 
-# ez altalaban hiba, mert a kulcs egyik táblában sem elsődleges.
-# Ha ezeket egyesitjuk, az osszes lehetseges kombinaciot megkapjuk
+# B) Duplicated in both tables:
+# this is usually an error, because the key is not primary in either table.
+# Joining will create all combinations
 
 x <- tribble(
-    ~nev, ~kor,
+    ~name, ~age,
     "Anna", "20",
     "Béla", "30",
     "Béla", "50",
@@ -453,113 +445,112 @@ x <- tribble(
 )
 
 y <- tribble(
-    ~nev, ~testtomeg,
+    ~name, ~weight,
     "Anna",  "60",
     "Béla",  "80",
     "Béla",  "100",
     "Csaba", "90"
 )
 
-left_join(x, y, by = "nev")
+left_join(x, y, by = "name")
 
-# Kulcsok meghatarozasa *_join() fuggvenyek by argumentuma
+# Specifying keys in *_join() via by argument
 
-# A) Alapbeallitas: by=NULL. Minden kozos valtozot felhasznal (natural join)
+# A) Default: by=NULL. Uses all common variables (natural join)
 
-flights2 %>% 
+flights2 %>%
     left_join(weather)
 
-# B) Karaktervektorral meghatarozva
-# Pl year valtozo van mindket tibble-ben, de nem ugyanazt jelenti!
+# B) Character vector
+# E.g. year exists in both tibble, but they don’t mean the same!
 
-flights2 %>% 
+flights2 %>%
     left_join(planes, by = "tailnum")
 
-# C) Nevesitett karaktervektorral pl. c("a" = "b")
+# C) Named character vector: c("a" = "b")
 
-# Célállomás koordinátáit kapcsoljuk:
+# Join destination coordinates:
 
-flights2 %>% 
+flights2 %>%
     left_join(airports, c("dest" = "faa"))
 
-# Kiinduló állomás koordinátáit kapcsoljuk:
+# Join origin coordinates:
 
-flights2 %>% 
+flights2 %>%
   left_join(airports, c("origin" = "faa"))
 
 
-# 2.1.1 Gyakorlás - mutating join -----------------------------------------
+# 2.1.1 Practice - mutating join -----------------------------------------
 
-# 1) Van-e összefüggés egy repülőgép életkora és a késései között?
-
-
+# 1) Is there a relationship between an airplane’s age and its delays?
 
 
-# 2) Az időjárásnak milyen vonatkozásai függenek össze az indulási késéssel?
+
+
+# 2) Which aspects of weather relate to departure delays?
 
 
   
 
 # 2.2 Filtering joins ------------------------------------------------------
 
-# A logika hasonló, mint a mutating join-nál,
-# de csak a megfigyelésekre van hatással
+# Same logic as mutating joins,
+# but affect only rows, not columns
 
-# semi_join(x, y) - megtart minden megfigyelést x-ből, aminek van párja y-ban
+# semi_join(x, y) – keep rows of x with a match in y
 
-# anti_join(x, y) - kidob minden megfigyelést x-ből, aminek van párja y-ban
+# anti_join(x, y) – drop rows of x with a match in y
 
-# Melyik a tíz legfrekventáltabb reptér?
+# What are the ten most frequent destinations?
 
 top_dest <- flights %>%
   count(dest, sort = TRUE) %>%
   head(10)
 top_dest
 
-# Melyik járatok mentek ezekre a repterekre?
+# Which flights went to these destinations?
 
-# Használhatnánk egy filtert:
+# We could use filter:
 
-flights %>% 
+flights %>%
   filter(dest %in% top_dest$dest)
 
-# Több változóval nehezebb lenne 
-# (pl. megkeresni a top10 napot napi átlag késés mentén),
-# ezért jobb a semi_join:
+# Harder with multiple variables 
+# (e.g., find top 10 days with highest average delay),
+# so semi_join is better:
 
-flights %>% 
+flights %>%
   semi_join(top_dest)
 
-# az anti_join pedig hasznos lehet, 
-# ha a kapcsolás során az egyezés hiányát akarjuk megnézni
+# anti_join helps inspect non‑matches
 
-# Melyik járatoknak nincs párja a planes táblában?
+# Which flights have no matching record in planes?
 
 flights %>%
   anti_join(planes, by = "tailnum") %>%
   count(tailnum, sort = TRUE)
 
 
-# 2.2.1 Gyakorlás - filtering join ----------------------------------------
+# 2.2.1 Practice - filtering join ----------------------------------------
 
-# 1) Szűrd le a flights táblát úgy, hogy csak azok a gépek járatai maradjanak benne,
-# amik legalább 100 utat megtettek!
-
-
-
-# 2) Találd meg az évnek azt a 48 óráját, amikor a legtöbbet késtek a gépek!
-# Kösd össze a weather táblával. Látsz-e mintázatokat?
+# 1) Filter flights to keep only flights by aircraft
+# that have flown at least 100 trips!
 
 
 
-# 2.3 Halmazműveletek ---------------------------------------------------------
+# 2) Identify the 48 hours of the year with the longest delays.
+# Join with weather. Do you see patterns?
 
-# Két tábla összevetésére is jók
-# Egész sorokon dolgoznak
-# Feltételezik, hogy mindkét tábla ugyanolyan változókból áll
-# A megfigyeléseket halmazokként kezelik
 
-# Metszet, unió és kivonás. Nézzük meg ezeken a példa adatokon!
+
+# 2.3 Set operations ---------------------------------------------------------
+
+# Also useful for comparing tables
+# They operate on whole rows
+# They assume both tables have the same variables
+# Observations are treated as sets
+
+# Intersection, union, and set difference. Example data:
 
 df1 <- tribble(
   ~x, ~y,
@@ -573,17 +564,16 @@ df2 <- tribble(
   1,  2
 )
 
-# Metszet: ami az elsőben és a másodikban is benne van
+# Intersection: rows present in both
 
 intersect(df1, df2)
 
-# Unió: ami az elsőben vagy a másodikban vagy mindkettőben benne van 
+# Union: rows in either or both tables
 
 union(df1, df2)
 
-# Kivonás: ami az elsőben benne van, de a másodikban nincs benne
+# Set difference: rows in first table but not second
 
 setdiff(df1, df2)
 
 setdiff(df2, df1)
-
