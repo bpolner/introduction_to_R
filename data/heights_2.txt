@@ -1,0 +1,4 @@
+name;age;height
+Anna;22;175,3
+B?ela;25;180,2
+Csaba;23;190,6

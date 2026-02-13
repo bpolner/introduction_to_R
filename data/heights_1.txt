@@ -1,0 +1,4 @@
+name,age,height
+Anna,22,195
+Bela,25,180
+Csaba,23,150
