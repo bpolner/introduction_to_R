@@ -1,0 +1,583 @@
+---
+title: "Felfedező adatelemzés"
+output:
+  html_notebook:
+    df_print: paged
+    toc: true
+    toc_float:
+      toc_collapsed: true
+---
+
+[link to R Notebook documentation](https://bookdown.org/yihui/rmarkdown/notebook.html)
+
+```{r, include=FALSE}
+# with this line we could set that code should not appear in the knitted document
+# knitr::opts_chunk$set(echo=FALSE)
+```
+
+Let’s load a few packages!
+
+```{r}
+library(tidyverse)
+library(plotly)
+library(htmlwidgets)
+library(GGally)
+library(gridExtra)
+library(corrplot)
+library(patchwork)
+```
+
+
+# What is exploratory data analysis about?
+
+The goal is to begin understanding the data.
+
+A creative process — rely on your intuition too.
+
+1. Come up with questions about the data!
+2. Try to answer them using visualizations, transformations, and models!
+3. Based on these, refine your questions and ask new ones!
+
+It’s worth starting with lots of questions; later it becomes clear
+which ones deserve more attention.
+
+There are no strict rules, but two questions are usually interesting:
+
+- what is the variance of the variables?
+- what is the covariance of the variables?
+
+## Examining the variance of a single variable
+
+Visualizing distributions
+
+Categorical variables: bar chart
+```{r}
+ggplot(data = diamonds) +
+  geom_bar(mapping = aes(x = cut, fill = cut))
+```
+
+The height of the bars shows the count of each possible *x* value  
+```{r}
+diamonds %>% 
+  count(cut)
+```
+
+
+Continuous variable distributions can be viewed using a histogram
+```{r}
+ggplot(data = diamonds) +
+  geom_histogram(mapping = aes(x = carat), binwidth = 0.5)
+```
+
+
+How the displayed values are computed:
+
+```{r}
+diamonds %>% 
+  count(cut_width(carat, 0.5))
+```
+
+The `binwidth` argument of `geom_histogram` determines  
+how large the intervals are when splitting the x variable for plotting —  
+try multiple values!
+
+Example: only diamonds under 3 carats, with narrower bins:
+
+```{r}
+smaller <- diamonds %>% 
+  filter(carat < 3)
+
+ggplot(data = smaller, mapping = aes(x = carat)) +
+  geom_histogram(binwidth = 0.1)
+
+```
+
+
+Same, faceted by cut:
+```{r, fig.height=6}
+ggplot(data = smaller, mapping = aes(x = carat)) +
+  geom_histogram(binwidth = 0.1) + 
+  facet_wrap(~ cut, nrow = 5)
+```
+
+
+If we want to show multiple category distributions on one plot, use lines:
+```{r}
+ggplot(data = smaller, mapping = aes(x = carat, colour = cut)) +
+  geom_freqpoly(binwidth = 0.1, size = 2)
+```
+
+
+What to observe?
+
+- What are the most common values? Why?
+- What are the rarest values? Why? Did we expect this?
+- Any unusual or strange patterns? What might cause them?
+
+
+What’s interesting about this figure?
+```{r}
+ggplot(data = smaller, mapping = aes(x = carat)) +
+  geom_histogram(binwidth = 0.01)
+```
+
+
+And this one?
+```{r}
+ggplot(data = faithful, mapping = aes(x = eruptions)) + 
+  geom_histogram(binwidth = 0.25) + 
+  xlab("Eruption duration (minutes)") +
+  ylab("Frequency") + 
+  ggtitle("Old Faithful geyser eruptions")
+```
+
+Clusters of similar values may indicate subgroups.
+
+- In what ways are observations within a group similar?
+- How do groups differ from each other?
+- How can we characterize the clusters?
+- Why might clusters be misleading?
+
+
+Outliers — unusual values
+
+Possible causes:
+
+- data entry error  
+- rare but informative event  
+
+```{r}
+ggplot(diamonds) + 
+  geom_histogram(mapping = aes(x = y), binwidth = 0.5)
+```
+
+Where is the outlier? Let’s zoom in:
+```{r}
+ggplot(diamonds) + 
+  geom_histogram(mapping = aes(x = y), binwidth = 0.5) +
+  coord_cartesian(ylim = c(0, 50))
+```
+
+
+Let’s inspect these observations more carefully:
+```{r}
+(unusual <- diamonds %>% 
+  filter(y < 3 | y > 20) %>% 
+  select(price, x, y, z) %>%
+  arrange(y))
+```
+
+Think carefully: what might have caused these anomalies?
+
+
+### Practice — plotting distributions
+
+Investigate the distribution of the `price` variable! Do you notice anything unusual?
+
+
+
+## Missing values
+
+What should we do with these strange diamonds?
+
+- We can drop them — why is this not ideal?
+
+```{r}
+diamonds2 <- diamonds %>% 
+  filter(between(y, 3, 20))
+```
+
+
+- Or we replace the strange values with missing values
+
+```{r}
+diamonds2 <- diamonds %>% 
+  mutate(y = ifelse(y < 3 | y > 20, NA, y))
+```
+
+
+```{r}
+ggplot(data = diamonds2, mapping = aes(x = x, y = y)) + 
+  geom_point()
+```
+
+ggplot2 warns about NAs
+
+But sometimes observations with missing values are exactly the interesting ones.  
+For example: when were cancelled flights supposed to depart?
+
+```{r}
+nycflights13::flights %>% 
+  mutate(
+    cancelled = is.na(dep_time),
+    sched_hour = sched_dep_time %/% 100,
+    sched_min = sched_dep_time %% 100,
+    sched_dep_time = sched_hour + sched_min / 60
+  ) %>% 
+  ggplot(mapping = aes(sched_dep_time)) + 
+  geom_freqpoly(mapping = aes(colour = cancelled), binwidth = 1/4)
+```
+
+Why is this figure not very informative? You'll get the chance to improve it in a bit.
+
+
+## Covariance of variables
+
+
+### Categorical vs continuous
+
+```{r}
+ggplot(data = diamonds, mapping = aes(x = price)) + 
+  geom_freqpoly(mapping = aes(colour = cut), binwidth = 500)
+```
+
+Because the frequencies differ greatly, we cannot clearly see  
+whether distributions differ across cuts.
+
+```{r}
+ggplot(diamonds) + 
+  geom_bar(mapping = aes(x = cut))
+```
+
+
+Instead of counts, show density:
+```{r}
+ggplot(data = diamonds, mapping = aes(x = price, y = ..density..)) + 
+  geom_freqpoly(mapping = aes(colour = cut), binwidth = 500)
+```
+
+
+Or use a boxplot:
+```{r}
+ggplot(data = diamonds, mapping = aes(x = cut, y = price)) +
+  geom_boxplot()
+```
+
+Are lower-quality diamonds more expensive?
+
+Cut is ordinal, but not all categorical variables are.  
+For example, fuel efficiency across car types:
+
+```{r}
+ggplot(data = mpg, mapping = aes(x = class, y = hwy)) +
+  geom_boxplot()
+```
+
+The plot becomes clearer if we sort classes by median highway mileage:
+
+```{r}
+ggplot(data = mpg) +
+  geom_boxplot(mapping = aes(x = reorder(class, hwy, FUN = median), y = hwy))
+```
+
+If variable names are long, flip the plot:
+```{r}
+ggplot(data = mpg) +
+  geom_boxplot(mapping = aes(x = reorder(class, hwy, FUN = median), y = hwy)) +
+  coord_flip() + 
+  xlab("Class") + 
+  ylab("Highway miles per gallon") + 
+  ggtitle("Classes of cars ranked by highway mileage")
+```
+
+#### Practice — covariance visualization 1
+
+How could we improve the following figure based on what we've learned?
+
+```{r}
+nycflights13::flights %>% 
+  mutate(
+    cancelled = is.na(dep_time),
+    sched_hour = sched_dep_time %/% 100,
+    sched_min = sched_dep_time %% 100,
+    sched_dep_time = sched_hour + sched_min / 60
+  ) %>% 
+  ggplot(mapping = aes(sched_dep_time)) + 
+  geom_freqpoly(mapping = aes(colour = cancelled), binwidth = 1/4)
+```
+
+
+### Categorical vs categorical
+
+```{r}
+ggplot(data = diamonds) +
+  geom_count(mapping = aes(x = cut, y = color))
+```
+
+Frequency table:
+```{r}
+diamonds %>% 
+  count(color, cut) 
+```
+
+Show as a heatmap:
+```{r}
+diamonds %>% 
+  count(color, cut) %>%  
+  ggplot(mapping = aes(x = color, y = cut)) +
+  geom_tile(mapping = aes(fill = n))
+```
+
+#### Practice — covariance visualization 2
+
+Using dplyr and geom_tile(), examine average delay by destination and month.  
+Why might this figure be difficult to interpret?  
+What could we do with it?
+
+
+
+
+### Continuous vs continuous
+
+```{r}
+ggplot(data = diamonds) +
+  geom_point(mapping = aes(x = carat, y = price))
+```
+
+Try transparency:
+```{r}
+ggplot(data = diamonds) + 
+  geom_point(mapping = aes(x = carat, y = price), alpha = 1 / 100)
+```
+
+Transparency doesn’t always help with large datasets.  
+In that case, bin the data:
+
+```{r}
+ggplot(data = smaller) +
+  geom_bin2d(mapping = aes(x = carat, y = price), bins = 30)
+```
+
+Or slice only one variable:
+```{r}
+ggplot(data = smaller, mapping = aes(x = carat, y = price)) + 
+  geom_boxplot(mapping = aes(group = cut_width(carat, 0.1)))
+```
+
+To show sample sizes in each box:
+```{r}
+ggplot(data = smaller, mapping = aes(x = carat, y = price)) + 
+  geom_boxplot(mapping = aes(group = cut_width(carat, 0.1)), varwidth = TRUE)
+```
+
+
+Or slice into equal-sized bins:
+```{r}
+ggplot(data = smaller, mapping = aes(x = carat, y = price)) + 
+  geom_boxplot(mapping = aes(group = cut_number(carat, 20)))
+```
+
+#### Practice — covariance visualization 3
+
+Using what we’ve learned, visualize the joint distribution of cut, carat, and price!
+
+
+
+# Complex exploratory analysis quickly
+
+## GGally
+
+Show distributions and relationships in one large figure:
+```{r, fig.width=10, fig.height=10, message=FALSE}
+ggpairs(iris, progress=FALSE)
+```
+
+Base R version:
+```{r, fig.height=7,  fig.width=7}
+pairs(iris, pch=16)
+```
+
+Additional scatterplot matrix options:  
+http://www.sthda.com/english/wiki/scatter-plot-matrices-r-base-graphs#r-base-scatter-plot-matrices-pairs
+
+`ggcoef()` is useful for quick inspection of model coefficients.
+
+Example:
+
+Which variables relate to fuel consumption?
+```{r}
+mtcars %>% 
+  select(mpg, disp, hp, wt) %>% 
+  pairs()
+```
+
+Fit a multiple regression model:
+```{r}
+model <- 
+  mtcars %>% 
+  select(mpg, disp, hp, wt) %>% 
+  # standardize variables to get standardized coefficients
+  mutate_all(scale) %>% 
+  lm(mpg ~  ., data = .)
+
+summary(model)
+```
+
+```{r}
+confint(model)
+```
+
+Plot coefficients:
+```{r}
+ggcoef(model)
+```
+
+
+## corrplot
+
+Correlation matrices:
+
+```{r}
+(corr_mat_cars <- 
+   mtcars %>% 
+   select(mpg, disp, hp, wt) %>% 
+   cor())
+```
+
+
+```{r}
+corr_mat_cars %>% 
+  corrplot()
+```
+
+```{r}
+p_mat <- 
+  mtcars %>% 
+  select(mpg, disp, hp, wt) %>% 
+  cor.mtest() %>% .[["p"]]
+
+corr_mat_cars %>% 
+  corrplot(p.mat       = p_mat, 
+           method      = "square", 
+           addCoef.col = "lightgrey", 
+           mar         = c(0.2,1,1,0.5), 
+           insig       = "blank")
+```
+
+corrplot is especially useful with many variables.
+
+Example with Big Five personality test (25 items):
+```{r}
+psych::bfi %>% 
+  select(-(gender:age)) %>% 
+  cor(use = "p") %>% 
+  corrplot(method      = "square", 
+           mar         = c(0.2,1,1,0.5))
+```
+
+
+# Multi-panel figures
+
+## gridArrange package
+
+```{r, message=FALSE, fig.width=15}
+p1 <- ggplot(diamonds) + 
+  geom_freqpoly(aes(price), col="blue",binwidth = 1000)
+
+p2 <- ggplot(diamonds) + 
+  geom_point(aes(carat, price), alpha = 0.01, col="blue")
+
+p3 <- ggplot(diamonds) + 
+  geom_histogram(aes(price), fill="blue", binwidth = 10)
+
+grid.arrange(p1, p2, p3, nrow = 1)
+```
+
+Fine-tune layout via `layout_matrix`:
+
+```{r, fig.width=15}
+grid.arrange(
+  p1, p2, p3, 
+  layout_matrix = 
+    rbind(
+      c(1, 2, 2),
+      c(3, 2, 2))
+)
+```
+
+https://cran.r-project.org/web/packages/egg/vignettes/Ecosystem.html
+
+## patchwork package
+
+```{r}
+p1 + p2 + p3 + plot_layout(ncol = 2)
+```
+
+
+# Interactive graphics with plotly
+
+https://plotly-r.com/
+
+Volcano example:
+```{r}
+plot_ly(z = ~volcano)
+```
+
+
+```{r}
+plot_ly(z = ~volcano) %>% add_surface()
+```
+
+
+Texas real estate data:
+```{r}
+txhousing
+```
+
+
+Two approaches to plotly graphics:
+
+1) `ggplotly()` — convert a ggplot  
+2) `plot_ly()` — specify data directly
+
+## ggplotly(): converting ggplot
+
+```{r}
+(p <- ggplot(txhousing, aes(date, median)) +
+  geom_line(aes(group = city), alpha = 0.2))
+```
+
+Tooltip shows all aesthetics:
+```{r}
+ggplotly(p)
+```
+
+We can customize tooltip:
+```{r}
+ggplotly(p, tooltip = "city")
+```
+
+
+## plot_ly(): direct data specification
+
+Use dplyr/tidyr for data manipulation.  
+plotly understands grouped data (creates elements per group).
+
+```{r}
+tx <- group_by(txhousing, city)
+```
+
+Create plotly object:
+```{r}
+p <- plot_ly(tx, x = ~date, y = ~median)
+```
+
+Inspect data:
+```{r}
+plotly_data(p)
+```
+
+Add lines:
+```{r}
+p %>% 
+  add_lines(alpha = 0.2, name = "Texan Cities", hoverinfo = "none") %>% 
+  add_lines(name = "Houston", data = filter(txhousing, city == "Houston"))
+```
+
+`add_*()` functions:
+
+- inherit `plot_ly()` axis & aesthetic settings  
+- inherit the plotly object's data (can be overridden via `data=`)
+
+Think of them like ggplot2 layers.
+
