@@ -1,0 +1,525 @@
+---
+title: "Multi-panel plots in patchwork"
+output: html_notebook
+---
+
+Code and text adapted from: https://patchwork.data-imaginist.com/index.html
+
+(accessed March 20 2026 13:55)
+
+Copyright 2017 COPYRIGHT HOLDER: Thomas Lin Pedersen
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the “Software”), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+Exercises created by: Bertalan Polner
+
+
+# Setup
+
+```{r}
+library(tidyverse) # probably installed already
+library(patchwork) # you might need to install this before you can load it
+library(gt) # you might need to install this too
+```
+
+
+# Basics
+
+Just add plots together!
+
+```{r}
+p1 <- ggplot(mtcars) + geom_point(aes(mpg, disp))
+p2 <- ggplot(mtcars) + geom_boxplot(aes(gear, disp, group = gear))
+
+p1 + p2
+```
+
+you can do more complex layouts
+
+```{r}
+p3 <- ggplot(mtcars) + geom_smooth(aes(disp, qsec))
+p4 <- ggplot(mtcars) + geom_bar(aes(carb))
+
+(p1 | p2 | p3) /
+      p4
+```
+
+## Exercise
+
+Tweak this figure a bit
+Put the barplot on top, and reverse the order of the panels, leaving out the boxplot
+1. trendline, 2. scatterplot
+
+```{r}
+
+```
+
+# Plot Assembly
+
+source: https://patchwork.data-imaginist.com/articles/guides/assembly.html
+
+Before plots can be laid out, they have to be assembled. Arguably one of
+patchwork's biggest selling points is that it expands on the use of `+` in
+ggplot2 to allow plots to be added together and composed, creating a natural
+extension of the ggplot2 API. There is more to it than that though, and this
+tutorial will teach you all about the different operators and functions
+available for plot assembly.
+
+As always, we'll start with a few well-known example plots:
+
+```{r}
+p1 <- ggplot(mtcars) +
+  geom_point(aes(mpg, disp)) +
+  ggtitle('Plot 1')
+
+p2 <- ggplot(mtcars) +
+  geom_boxplot(aes(gear, disp, group = gear)) +
+  ggtitle('Plot 2')
+
+p3 <- ggplot(mtcars) +
+  geom_point(aes(hp, wt, colour = mpg)) +
+  ggtitle('Plot 3')
+
+p4 <- ggplot(mtcars) +
+  geom_bar(aes(gear)) +
+  facet_wrap(~cyl) +
+  ggtitle('Plot 4')
+```
+
+## Adding plots to the patchwork
+
+
+It is possible to assemble a number of plots, but that is 
+not the only thing that can be added! 
+Other patchworks can be added, and will create a new nested patchwork:
+
+```{r}
+patch <- p1 + p2
+p3 + patch
+```
+
+### Adding tables
+
+patchwork has deep support for working with tables powered by the gt package and
+it provides you with the means to define what to align with the panel region as
+well as whether to respect the table size when setting the size for the rows and
+columns in the patchwork.
+
+If you just want the standard settings you can add a gt table directly to a
+plot
+
+```{r}
+p1 + gt::gt(mtcars[1:10, c('mpg', 'disp')])
+```
+
+
+### Adding other content
+Sometimes you need to have other content than ggplot2 in your patchwork.
+Standard grid grobs can be added to your plot as well:
+
+```{r}
+p1 + grid::textGrob('Some really important text')
+```
+
+Other packages might provide even more elaborate grob specifications and these
+can likewise be added directly.
+
+Now and then, it is necessary to work with plots from the graphics package
+(*base graphics*). These can be added to patchwork by providing them as a
+one-sided formula:
+
+```{r}
+p1 + ~plot(mtcars$mpg, mtcars$disp, main = 'Plot 2')
+```
+
+Another use case for  `wrap_elements()` is when you need the first plot to not
+be a ggplot. Patchwork is not able to change the `+` behavior for miscellaneous
+objects, and so, if they appear as the first element they must be wrapped in
+an object that patchwork understands:
+
+```{r}
+# This won't do anything
+grid::textGrob('Text on left side') + p1
+```
+```{r}
+# This will work
+wrap_elements(grid::textGrob('Text on left side')) + p1
+```
+
+### Stacking and packing
+The `+` operator simply combines plots without telling patchwork anything about
+the desired layout. The layout, unless changed with `plot_layout()` (See the
+[Controlling Layout](layout.html) guide), will simply be a grid with enough rows
+and columns to contain the number of plots, while being as square as possible.
+For the special case of putting plots besides each other or on top of each
+other patchwork provides 2 shortcut operators. `|` will place plots next to each
+other while `/` will place them on top of each other.
+
+```{r}
+p1 / p2
+```
+
+```{r}
+p1 | p2
+```
+
+For up to 3 plots `|` will behave just as `+` but using `|` will communicate the
+intend of the layout better. Be aware that mixing operators will put you under
+the control of the operator precedence rule (e.g. `/` will be evaluated before
+`+`). Because of this it is always a good idea to put sub-assemblies within
+braces to avoid any surprises:
+
+```{r}
+p1 / (p2 | p3)
+```
+
+### Functional assembly
+While using the different operators provides a clean API for assembly, it is
+less suited for situations where you are not in control of the plot-generation
+process. If you are handed a list of plot objects and want to assemble them to
+a patchwork it is a bit clumsy using the `+` operator (but doable with a loop or
+`Reduce()`). patchwork provides `wrap_plots()` for a more functional approach to
+assembly. It takes either separate plots or a list of them and adds them to a
+single patchwork. On top of that it also accepts the same arguments as
+`plot_layout()` (see the [Controlling Layouts](layout.html) guide) so it can be
+used as a single solution for most assembly needs:
+
+```{r}
+wrap_plots(p1, p2, p3, p4)
+```
+
+## Nesting the left-hand side
+As plots will always be added to the patchwork on the left-hand side, it is not
+possible to nest the left-hand side beside the right-hand side with the standard
+operators shown above. This can lead to surprising behavior:
+
+```{r}
+patch <- p1 + p2
+p3 + patch
+```
+
+will nest the right-hand side, while the same is not true for the left-hand side
+below
+
+```{r}
+patch + p3
+```
+
+This behavior is necessary to allow patchworks to be build up gradually, but
+will get in the way if the left-hand side have to nested. patchwork provides the
+`-` operator for this exact situation. It should conceptually be understood as a
+hyphen and not a minus, in that it keeps each side from each other (it puts both
+on the same nesting level):
+
+```{r}
+patch - p3
+```
+
+An alternative to `-` is to use `merge()` on the left hand side which does the
+same thing. Using this approach it is possible to use it in combination with `/`
+and `|` which is not an option when using `-`.
+
+Yet another way to solve this is with `wrap_plots()`, which will put all its
+input on the same nesting level, irrespective of order:
+
+```{r}
+wrap_plots(patch, p3)
+```
+
+## Modifying patches
+
+### Modifying everything
+
+Often, especially when it comes to theming, you want to modify everything at
+once. patchwork provides two additional operators that facilitates this. `&`
+will add the element to all subplots in the patchwork, and `*` will add the
+element to all the subplots in the current nesting level. As with `|` and `/`,
+be aware that operator precedence must be kept in mind.
+
+```{r}
+patchwork <- p3 / (p1 | p2)
+patchwork & theme_minimal()
+```
+```{r}
+patchwork * theme_minimal()
+```
+## Exercise - Plot Assembly
+
+Create a multi-panel figure with a 2x2 layout where:
+top-left: boxplot (gear-displ) & scatterplot (hp-wt) nested together
+top-right: a text saying something nice
+bottom-left: same scatterplot (hp-wt) alone
+bottom-right: faceted barplot (plot4)
+
+Pick a pretty theme (hint: type theme in a chunk and hit tab to see some options!)
+
+# Controlling Layouts
+
+https://patchwork.data-imaginist.com/articles/guides/layout.html
+
+While quite complex compositions can be achieved using `+`, `|`, and `/`, it may be necessary to take even more control over the layout. All of this can be controlled using the `plot_layout()` function along with a couple of special placeholder objects. We'll use our well-known mtcars plots to show the different options.
+
+## Adding an empty area
+
+Sometimes all that is needed is to have an empty area in between plots. This can be done by adding a `plot_spacer()`. It will occupy a grid cell in the same way a plot without any outer elements (titles, ticks, strips, etc.):
+
+```{r}
+p1 + plot_spacer() + p2 + plot_spacer() + p3 + plot_spacer() theme
+```
+
+It is important to understand that the added area only corresponds to the size of a plot panel. This means that spacers in separate nesting levels may have different dimensions:
+
+```{r}
+(p1 + plot_spacer() + p2) / (plot_spacer() + p3 + plot_spacer())
+```
+
+## Controlling the grid
+
+If nothing is given, patchwork will try to make a grid as square as possible, erring to the side of a horizontal grid if a square is not possible (it uses the same heuristic as `facet_wrap()` in ggplot2). Further, each column and row in the grid will take up the same space. Both of these can be controlled with `plot_layout()`
+
+```{r}
+p1 + p2 + p3 + p4 +
+  plot_layout(ncol = 3)
+```
+
+```{r}
+p1 + p2 + p3 + p4 +
+  plot_layout(widths = c(2, 1))
+```
+
+
+## Moving beyond the grid
+
+Earlier, when we've wanted to create non-grid compositions, we've used nesting. While this is often enough, you end up losing the alignment between subplots from different nested areas. An alternative is to define a layout design to fill the plots into. Such a design can be defined in two different ways. The easiest is to use a textual representation:
+
+```{r}
+layout <- "
+##BBBB
+AACCDD
+##CCDD
+"
+p1 + p2 + p3 + p4 +
+  plot_layout(design = layout)
+```
+
+When using the textual representation it is your responsibility to make sure that each area is rectangular. The only exception is `#` which denotes empty areas and can thus be of any shape.
+
+## Avoiding alignment
+
+Patchwork is designed to do it's utmost to align the plotting areas, and while this is generally sensible in order to create a calm and good looking layout it sometimes gets in the way of creating what you want. Below we will see two such cases. In both situation the answer is the `wrap_elements()` function.
+
+### Huge axis text causing white space.
+
+Sometimes one of the plots has much longer axis text or axis labels than the other:
+
+```{r}
+p2mod <- p2 + labs(x = "This is such a long\nand important label that\nit has to span many lines")
+p1 | p2mod
+```
+
+Depending on what you prefer you might want the leftmost plot to fill out as much room as possible instead of being aligned to the rightmost panel. Putting a ggplot or a patchwork inside `free()` removes any alignment from the plot.
+
+```{r}
+free(p1) | p2mod
+```
+
+### Designs don't keep an even width
+
+When creating a complex layout using a design you may create setups where plots spans the edge of other plots and be surprised how that affects the width of the panels in the design:
+
+```{r}
+design <- "#AAAA#
+           #AAAA#
+           BBCCDD
+           EEFFGG"
+p3 + p2 + p1 + p4 + p4 + p1 + p2 +
+  plot_layout(design = design)
+```
+
+In the above we see that the 3 bottom columns all have different widths despite being given the same amount of space in the design matrix. The reason for this is that the top plot has a y-axis to the left and a guide to the right, and those fall in between the two columns that make up the 1st and 3rd column in the bottom. Subsequently those plots are expanded to fill out the space. Once again `free()` will save us from this:
+
+```{r}
+free(p3) + p2 + p1 + p4 + p4 + p1 + p2 +
+  plot_layout(design = design)
+```
+
+## Insets
+
+An alternative to placing plots in a grid is to place a plot as an inset in another plot. 
+We can use the `inset_element()` function which marks a plot or graphic object to be placed as an inset on the previous plot. It will thus not take up a slot in the provided layout, but share the slot with the previous plot. `inset_element()` allows you to freely position your inset relative to either the panel, plot, or full area of the previous plot, by specifying the location of the left, bottom, right, and top edge of the inset.
+
+```{r}
+p1 + inset_element(p2, left = 0.6, bottom = 0.6, right = 1, top = 1)
+```
+
+
+## Controlling guides
+
+Plots often have guides to help viewers deduce the aesthetic mapping. When composing plots we need to think about what to do about these. The default behavior is to leave these alone and simply let them follow the plot around. Examples of this can be seen above where the color guide is always positioned beside Plot 3. Such behavior is fine if the purpose is simply to position a bunch of otherwise unrelated plots next to each other. If the purpose of the composition is to create a new tightly coupled visualization, the presence of guides in between the plots can be jarring, though. The `plot_layout()` function provides a `guides` argument that controls how guides should be treated. To show how it works, let's see what happens if we set it to `'collect'`:
+
+```{r}
+p1 + p2 + p3 + p4 +
+  plot_layout(guides = 'collect')
+```
+
+We can see that the guide has been hoisted up and placed beside all the plots. The alternative to `'collect'` is `'keep'`, which makes sure that guides are kept next to their plot. The default value is `'auto'`, which is sort of in between (see more details on the website).
+
+The guide collection has another trick up its sleeve. If multiple plots provide the same guide, you don't want to have it show up multiple times. When collecting guides it will compare them with each other and remove duplicates.
+
+```{r}
+p1a <- ggplot(mtcars) +
+  geom_point(aes(mpg, disp, colour = mpg, size = wt)) +
+  ggtitle('Plot 1a')
+
+p1a | (p2 / p3)
+```
+
+```{r}
+(p1a | (p2 / p3)) + plot_layout(guides = 'collect')
+```
+
+Guides are compared by their graphical representation, not by their declarative specification. This means that different theming among plots may mean that two guides showing the same information is not merged.
+
+Now and then you end up with an empty area in you grid. Instead of leaving it empty, you can specify it as a place to put the collected guides, using the `guide_area()` placeholder. It works much the same as `plot_spacer()`, and if guides are not collected it will do exactly the same. But if guides are collected they will be placed there instead of where the theme tells it to.
+
+```{r}
+p1 + p2 + p3 + guide_area() +
+  plot_layout(guides = 'collect')
+```
+
+Guide areas are only accessible on the same nesting level. If a nested patchwork has a guide area it will not be possible to place guides collected at a higher level there.
+
+## Controlling Axes
+
+Much like the legends above, axes can sometimes be shared between plots. However, this only makes sense if the plots are positioned besides each other on top of having the exact same axis. patchwork provides two arguments to `plot_layout()` for controlling axes and they work much like the `guides` argument except they don't allow recursing into nested patchworks (for obvious reasons).
+
+In the plot below the y-axis is redundant and could be kept to the side like we are used to from faceted plots:
+
+```{r}
+p1 + p2
+```
+
+This is easily fixed with the `axes` argument
+
+```{r}
+p1 + p2 + plot_layout(axes = "collect")
+```
+
+By default the axis title follows the collecting setting for the axis. We could also only collect the titles
+
+```{r}
+p1 + p2 + plot_layout(axis_titles = "collect")
+```
+
+This makes a lot of sense if the axes doesn't match exactly but still share the same title. Further, title collecting also work in the other direction:
+
+```{r}
+p1 / p2 + plot_layout(axis_titles = "collect")
+```
+
+## Exercise - Controlling Layouts
+
+Make the scatterplot 3 times as wide as the boxplot
+
+Add some empty space between the 2 plots
+
+There's some empty space in the top-right corner of the scatterplot
+Use that to show plot3 as an inset
+
+
+```{r}
+p1 + p2 + plot_layout(axis_titles = "collect")
+```
+
+# Adding Annotation and Style
+
+https://patchwork.data-imaginist.com/articles/guides/annotation.html 
+
+## Titles, subtitles and captions
+
+One of the most needed things is to add descriptive text to your plot ensemble. 
+To achieve this, you simply add it to your patchwork using `plot_annotation()`
+
+```{r}
+patchwork <- (p1 + p2) / p3
+patchwork + plot_annotation(
+  title = 'The surprising truth about mtcars',
+  subtitle = 'These 3 plots will reveal yet-untold secrets about our beloved data-set',
+  caption = 'Disclaimer: None of these plots are insightful'
+)
+```
+
+It is important to note that plot annotations only have an effect on the 
+top-level patchwork. Any annotation added to nested patchworks are (currently) 
+lost. If you need to have annotations for a nested patchwork you'll need to wrap 
+it in `wrap_elements()` with the side-effect that alignment no longer works.
+
+## Tagging
+
+Often, especially in scientific literature, multiple plots are collected in a
+single figure and referred to by a tag. While such tags could be added manually,
+it is much simpler to let patchwork handle it for you, using the auto-tagging
+functionality. This is turned on by setting `tag_level` in `plot_annotation()`
+to a value indicating the family of symbols to use for tagging: `'1'` for 
+Arabic numerals, `'A'` for uppercase Latin letters, `'a'` for lowercase Latin
+letters, `'I'` for uppercase Roman numerals, and `'i'` for lowercase Roman 
+numerals.
+
+```{r}
+patchwork + plot_annotation(tag_levels = 'A')
+```
+
+Tags uses the theming of the plot they are applied to, so make sure they match 
+up, or modify the theming of all plots using `&` (see the 
+[Plot Assembly](assembly.html) guide).
+
+```{r}
+patchwork + 
+  plot_annotation(tag_levels = 'A') & 
+  theme(plot.tag = element_text(size = 8))
+```
+
+
+## Styling the patchwork
+
+Most of the style of the patchwork is made up by the themes of the individual 
+patches. For a coherent look, don't mix widely different looks. Setting the 
+background colour of a single plot to a different shade is an effective way to
+highlight it, but e.g. different fonts or line widths will just look like a 
+mess. The patchwork itself has a few elements itself that is susceptible to 
+theming: A background, a margin, and title, subtitle & caption. The theme of
+the patchwork is by default the default ggplot2 theme. It can be changed though,
+in two different ways. The easiest is to simply use `&` with a theme element. 
+This operator will add to the theme of all subplots as well as to the theme of
+the patchwork itself:
+
+```{r}
+patchwork + 
+  plot_annotation(title = 'The surprising truth about mtcars') & 
+  theme(text = element_text('mono'))
+```
+
+If you need to address only the theme of the patchwork itself (e.g. for making
+the patchwork title larger than the plot titles), it can be done with the 
+`theme` argument in `plot_annotation()` (note that the use of one does not 
+exclude the other):
+
+```{r}
+patchwork + 
+  plot_annotation(title = 'The surprising truth about mtcars',
+                  theme = theme(plot.title = element_text(size = 18))) & 
+  theme(text = element_text('mono'))
+```
+
+## Exercise - Annotation & Style
+
+Take the plot we created in the last exercise. 
+
+Make it speak for itself by adding annotations. 
+Try out a special font type, and highlight the patchwork title in bold. 
+
+Extra: highlight one of the plots using a dark theme. 
